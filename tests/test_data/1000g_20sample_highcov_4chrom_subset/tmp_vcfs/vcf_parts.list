@@ -1,0 +1,4 @@
+tests/test_data/1000g_20sample_highcov_4chrom_subset/tmp_vcfs/1000g_20samples_highcov.chr2_10000000-10049999.vcf.gz
+tests/test_data/1000g_20sample_highcov_4chrom_subset/tmp_vcfs/1000g_20samples_highcov.chr7_50000000-50049999.vcf.gz
+tests/test_data/1000g_20sample_highcov_4chrom_subset/tmp_vcfs/1000g_20samples_highcov.chr12_25000000-25049999.vcf.gz
+tests/test_data/1000g_20sample_highcov_4chrom_subset/tmp_vcfs/1000g_20samples_highcov.chr20_10000000-10049999.vcf.gz

@@ -1,8 +1,28 @@
 .DS_Store
-validation/
-work/
+
 .git.broken
 .claude
-results/
+__pycache__/
+*.py[cod]
+
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.cache/
+.conda_envs/
+
 dev/
+build/
 dist/
+*.egg-info/
+docs/_build/
+validation/
+
+results/
+work/
+
+# htslib/bcftools may cache remote 1000 Genomes source VCF indexes in the repo root.
+/1kGP_high_coverage_Illumina.chr*.filtered.SNV_INDEL_SV_phased_panel.vcf.gz.tbi
+
+# CRAM reference slices can exceed GitHub's regular-file limits.
+tests/test_data/**/ref_cache/
