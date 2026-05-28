@@ -1,13 +1,14 @@
-# sprite-mask
+# sprite
 
-`sprite-mask` installs the `sprite` CLI for building sparse depth-threshold mask BEDs
-from a cohort of BAM/CRAM files or a prefiltered all-sites VCF.
-In BAM/CRAM mode, it uses `mosdepth` to find per-sample intervals that meet a depth
-threshold, uses `bedtools multiinter` to intersect those intervals across samples,
-then writes collapsed population-count BED outputs. In all-sites VCF mode, it reads
-per-sample `FORMAT/DP` values directly from the VCF and does not run `mosdepth`.
+`sprite` is a CLI utility for building sparse quantized depth-threshold mask BEDs
+from a cohort of BAM/CRAM files OR a prefiltered all-sites VCF. It is a companion
+utility for pixy, but can also be used on its own.
 
-The package also installs `sprite-mask` as an explicit alias for the same CLI.
+These can be used along with a variants-only VCF to properly computed the denominators
+of pi, dxy, Watterson's theta, and Tajima's D.
+
+The package is distributed on bioconda as `sprite-mask` (just `sprite` was taken!), but
+the software is invoked on the command line with just `sprite`.
 
 ## Install
 
@@ -73,10 +74,10 @@ VCF `FILTER` values; the input is assumed to have already been filtered as desir
 When duplicate records share a `CHROM:POS`, a sample passes that base if any duplicate
 record has `FORMAT/DP >= --threshold`.
 
-Outputs include:
+Rardeless of mode, sprite outputs two main files:
 
-- `cohort.sprite.bed.gz`
-- `cohort.sprite.bed.gz.tbi`
+- `.sprite.bed.gz`
+- `.sprite.bed.gz.tbi`
 
 The final population BED output is sparse: intervals absent from the file are interpreted as
 zero passing samples per population. The `*.sprite.bed.gz` file
@@ -88,7 +89,7 @@ file is sorted, bgzip-compressed, and tabix-indexed.
 
 ## Test Data
 
-Fixture-generation scripts live in `tests/test_data/scripts/`:
+Fixture-generation scripts using the Hg1000 dataset live in `tests/test_data/scripts/`:
 
 ```bash
 bash tests/test_data/scripts/download_1000g_10sample_chr20_highcov_fixture.sh
@@ -97,11 +98,4 @@ bash tests/test_data/scripts/download_1000g_20sample_4chrom_highcov_fixture.sh
 
 ## Documentation
 
-The project documentation is built with Sphinx and the Read the Docs theme:
-
-```bash
-python -m pip install -e ".[docs]"
-make -C docs html
-```
-
-Open `docs/_build/html/index.html` after the build completes.
+The project documentation can be found here (link TBD).
