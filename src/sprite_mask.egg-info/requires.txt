@@ -1,0 +1,11 @@
+
+[dev]
+build
+mypy
+pytest
+pytest-cov
+ruff
+
+[docs]
+sphinx<9,>=7
+sphinx-rtd-theme<4,>=2

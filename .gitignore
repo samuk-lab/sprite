@@ -1,0 +1,8 @@
+.DS_Store
+validation/
+work/
+.git.broken
+.claude
+results/
+dev/
+dist/
