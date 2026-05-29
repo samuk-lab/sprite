@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import gzip
+import logging
 from bisect import bisect_right
 from collections import Counter
 from dataclasses import dataclass
@@ -11,6 +12,8 @@ from sprite_mask.bedio import iter_bed3
 from sprite_mask.collapse import write_quantized_bed_header
 from sprite_mask.models import Sample
 from sprite_mask.samples import populations_in_order
+
+logger = logging.getLogger(__name__)
 
 
 def build_population_counts_from_all_sites_vcf(
@@ -122,7 +125,7 @@ def build_population_counts_from_all_sites_vcf(
 def validate_vcf_sample_names(samples: list[Sample], all_sites_vcf: Path) -> None:
     with _open_text(all_sites_vcf) as source:
         vcf_samples, _next_line_number = _read_vcf_samples(source, all_sites_vcf)
-    _selected_sample_columns(samples, vcf_samples, all_sites_vcf)
+    _selected_sample_columns(samples, vcf_samples, all_sites_vcf, warn_extra=True)
 
 
 @dataclass(frozen=True)
@@ -189,6 +192,8 @@ def _selected_sample_columns(
     samples: list[Sample],
     vcf_samples: list[str],
     path: Path,
+    *,
+    warn_extra: bool = False,
 ) -> list[int]:
     vcf_sample_columns = {sample: index for index, sample in enumerate(vcf_samples)}
     requested_sample_ids = {sample.sample_id for sample in samples}
@@ -196,13 +201,15 @@ def _selected_sample_columns(
         sample.sample_id for sample in samples if sample.sample_id not in vcf_sample_columns
     ]
     extra_vcf_samples = [sample for sample in vcf_samples if sample not in requested_sample_ids]
-    if missing_samples or extra_vcf_samples:
-        details = []
-        if missing_samples:
-            details.append("popfile sample(s) absent from VCF: " + ", ".join(missing_samples))
-        if extra_vcf_samples:
-            details.append("VCF sample(s) absent from popfile: " + ", ".join(extra_vcf_samples))
-        raise ValueError(f"{path} sample mismatch with popfile: " + "; ".join(details))
+    if missing_samples:
+        details = "popfile sample(s) absent from VCF: " + ", ".join(missing_samples)
+        raise ValueError(f"{path} sample mismatch with popfile: {details}")
+    if extra_vcf_samples and warn_extra:
+        logger.warning(
+            "%s contains VCF sample(s) absent from popfile; these samples will be ignored: %s",
+            path,
+            ", ".join(extra_vcf_samples),
+        )
     return [vcf_sample_columns[sample.sample_id] for sample in samples]
 
 

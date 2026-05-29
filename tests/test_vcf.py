@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from sprite_mask.models import Sample
-from sprite_mask.vcf import build_population_counts_from_all_sites_vcf
+from sprite_mask.vcf import build_population_counts_from_all_sites_vcf, validate_vcf_sample_names
 
 
 def test_build_population_counts_from_all_sites_vcf_merges_site_counts(
@@ -77,23 +77,54 @@ def test_build_population_counts_from_all_sites_vcf_requires_popfile_samples(
         )
 
 
-def test_build_population_counts_from_all_sites_vcf_rejects_vcf_samples_absent_from_popfile(
+def test_build_population_counts_from_all_sites_vcf_ignores_vcf_samples_absent_from_popfile(
     tmp_path: Path,
 ) -> None:
     vcf = tmp_path / "all_sites.vcf"
     vcf.write_text(
         "##fileformat=VCFv4.2\n"
         "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\ts2\n"
-        "chr1\t1\t.\tA\t.\t.\t.\t.\tGT:DP\t0/0:10\t0/0:7\n"
+        "chr1\t1\t.\tA\t.\t.\t.\t.\tGT:DP\t0/0:0\t0/0:7\n"
     )
 
-    with pytest.raises(ValueError, match="VCF sample.*absent from popfile: s2"):
-        build_population_counts_from_all_sites_vcf(
-            [Sample("s1", "popA")],
-            vcf,
-            tmp_path / "population_counts.bed",
-            threshold=5,
-        )
+    out = tmp_path / "population_counts.bed"
+    build_population_counts_from_all_sites_vcf(
+        [Sample("s1", "popA")],
+        vcf,
+        out,
+        threshold=5,
+    )
+
+    assert out.read_text().splitlines()[1:] == ["#chrom\tstart\tend\tpopA"]
+
+
+def test_validate_vcf_sample_names_warns_for_vcf_samples_absent_from_popfile(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    vcf = tmp_path / "all_sites.vcf"
+    vcf.write_text(
+        "##fileformat=VCFv4.2\n"
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\ts2\n"
+    )
+
+    validate_vcf_sample_names([Sample("s1", "popA")], vcf)
+
+    assert "VCF sample(s) absent from popfile" in caplog.text
+    assert "these samples will be ignored: s2" in caplog.text
+
+
+def test_validate_vcf_sample_names_rejects_popfile_samples_absent_from_vcf(
+    tmp_path: Path,
+) -> None:
+    vcf = tmp_path / "all_sites.vcf"
+    vcf.write_text(
+        "##fileformat=VCFv4.2\n"
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\n"
+    )
+
+    with pytest.raises(ValueError, match="popfile sample.*absent from VCF: s2"):
+        validate_vcf_sample_names([Sample("s1", "popA"), Sample("s2", "popB")], vcf)
 
 
 def test_build_population_counts_from_gzipped_vcf_with_custom_depth_field(

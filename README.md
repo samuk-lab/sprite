@@ -72,7 +72,8 @@ sample_1   popA
 sample_2   popB
 ```
 
-VCF mode expects the popfile samples to match the VCF sample columns exactly.
+VCF mode requires every popfile sample to be present in the VCF. VCF sample
+columns that are absent from the popfile produce a warning and are ignored.
 Records may carry VCF `FILTER` values; the input is assumed to have already been
 filtered as desired.
 When duplicate records share a `CHROM:POS`, a sample passes that base if any duplicate

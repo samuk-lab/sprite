@@ -56,7 +56,9 @@ All-sites VCF
 =============
 
 ``--all-sites-vcf`` must point to a VCF with a ``#CHROM`` header and sample
-columns. The VCF sample columns and ``--popfile`` sample IDs must match exactly.
+columns. Every ``--popfile`` sample ID must be present in the VCF. VCF sample
+columns that are absent from ``--popfile`` produce a warning and are ignored in
+the final output.
 
 For each record, ``sprite`` reads the ``DP`` field from the sample's
 ``FORMAT`` value. Missing DP values do not pass. Non-integer DP values are
