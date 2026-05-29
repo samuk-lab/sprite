@@ -25,6 +25,7 @@ dev = [
 docs = [
   "sphinx>=7,<9",
   "sphinx-rtd-theme>=2,<4",
+  "tomli>=2; python_version < '3.11'",
 ]
 
 [project.scripts]
