@@ -7,7 +7,7 @@ Requirements
 ``sprite`` requires Python 3.11 or 3.12. Runtime command line tools depend
 on the input mode:
 
-* BAM/CRAM mode requires ``mosdepth``, ``bedtools``, ``bgzip``, and ``tabix``.
+* BAM/CRAM mode requires ``samtools``, ``mosdepth``, ``bedtools``, ``bgzip``, and ``tabix``.
 * All-sites VCF mode requires ``bgzip`` and ``tabix``.
 
 The repository environment file installs these external tools from conda-forge

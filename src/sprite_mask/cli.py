@@ -51,10 +51,7 @@ def _cmd_from_alignments(args: argparse.Namespace) -> int:
         force=args.force,
         dry_run=args.dry_run,
     )
-    outputs = run_workflow(config)
-    if not args.dry_run:
-        print(f"Wrote {outputs.population_count_bed_gz}")
-        print(f"Wrote {outputs.population_count_bed_index}")
+    run_workflow(config)
     return 0
 
 
@@ -70,10 +67,7 @@ def _cmd_from_vcf(args: argparse.Namespace) -> int:
         force=args.force,
         dry_run=args.dry_run,
     )
-    outputs = run_workflow(config)
-    if not args.dry_run:
-        print(f"Wrote {outputs.population_count_bed_gz}")
-        print(f"Wrote {outputs.population_count_bed_index}")
+    run_workflow(config)
     return 0
 
 
@@ -163,7 +157,13 @@ def _setup_logging(*, verbose: bool, quiet: bool) -> None:
         level = logging.WARNING
     else:
         level = logging.INFO
-    logging.basicConfig(level=level, format="%(levelname)s: %(message)s", stream=sys.stderr)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s [sprite] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        stream=sys.stderr,
+        force=True,
+    )
 
 
 def _print_subprocess_error(error: subprocess.CalledProcessError) -> None:

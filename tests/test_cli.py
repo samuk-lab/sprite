@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -10,6 +11,14 @@ import pytest
 
 from sprite_mask.cli import main
 from sprite_mask.models import WorkflowOutputs
+
+SPRITE_PROGRESS_RE = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[sprite\] Analysis ")
+
+
+def assert_sprite_progress(log_output: str, message: str) -> None:
+    matching_lines = [line for line in log_output.splitlines() if message in line]
+    assert matching_lines
+    assert SPRITE_PROGRESS_RE.match(matching_lines[0])
 
 
 def test_main_all_sites_vcf_writes_indexed_population_bed(
@@ -53,8 +62,11 @@ def test_main_all_sites_vcf_writes_indexed_population_bed(
 
     assert status == 0
     captured = capsys.readouterr()
-    assert "cohort.sprite.bed.gz" in captured.out
-    assert captured.err == ""
+    assert captured.out == ""
+    assert_sprite_progress(captured.err, "Analysis start: validating VCF workflow inputs")
+    assert_sprite_progress(captured.err, "Analysis VCF: building population counts")
+    assert_sprite_progress(captured.err, "Analysis complete: wrote")
+    assert "cohort.sprite.bed.gz" in captured.err
 
     population_bed = out_dir / "cohort.sprite.bed.gz"
     population_index = Path(f"{population_bed}.tbi")
@@ -84,7 +96,7 @@ def test_main_all_sites_vcf_writes_indexed_population_bed(
     assert completed.stdout.strip() == "chr1\t1\t3\t1\t1"
 
 
-def test_main_builds_run_config_and_prints_outputs(
+def test_main_builds_alignment_run_config(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
@@ -145,10 +157,7 @@ def test_main_builds_run_config_and_prints_outputs(
     assert seen_config.force is True
 
     captured = capsys.readouterr()
-    assert captured.out == (
-        f"Wrote {tmp_path / 'out' / 'cohort.sprite.bed.gz'}\n"
-        f"Wrote {tmp_path / 'out' / 'cohort.sprite.bed.gz.tbi'}\n"
-    )
+    assert captured.out == ""
     assert captured.err == ""
 
 

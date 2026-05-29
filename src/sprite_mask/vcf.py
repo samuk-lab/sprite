@@ -119,6 +119,12 @@ def build_population_counts_from_all_sites_vcf(
     return output_bed
 
 
+def validate_vcf_sample_names(samples: list[Sample], all_sites_vcf: Path) -> None:
+    with _open_text(all_sites_vcf) as source:
+        vcf_samples, _next_line_number = _read_vcf_samples(source, all_sites_vcf)
+    _selected_sample_columns(samples, vcf_samples, all_sites_vcf)
+
+
 @dataclass(frozen=True)
 class _TargetIndex:
     starts_by_chrom: dict[str, list[int]]
@@ -185,13 +191,18 @@ def _selected_sample_columns(
     path: Path,
 ) -> list[int]:
     vcf_sample_columns = {sample: index for index, sample in enumerate(vcf_samples)}
+    requested_sample_ids = {sample.sample_id for sample in samples}
     missing_samples = [
         sample.sample_id for sample in samples if sample.sample_id not in vcf_sample_columns
     ]
-    if missing_samples:
-        raise ValueError(
-            f"{path} is missing popfile sample(s): " + ", ".join(missing_samples)
-        )
+    extra_vcf_samples = [sample for sample in vcf_samples if sample not in requested_sample_ids]
+    if missing_samples or extra_vcf_samples:
+        details = []
+        if missing_samples:
+            details.append("popfile sample(s) absent from VCF: " + ", ".join(missing_samples))
+        if extra_vcf_samples:
+            details.append("VCF sample(s) absent from popfile: " + ", ".join(extra_vcf_samples))
+        raise ValueError(f"{path} sample mismatch with popfile: " + "; ".join(details))
     return [vcf_sample_columns[sample.sample_id] for sample in samples]
 
 

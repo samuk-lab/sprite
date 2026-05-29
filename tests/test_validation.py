@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 
 import pytest
 
+from sprite_mask.models import Sample
 from sprite_mask.validation import (
     ensure_parent_dirs,
     refuse_existing_outputs,
     require_executables,
+    validate_alignment_sample_headers,
     validate_jobs,
     validate_threads,
     validate_threshold,
@@ -35,6 +38,106 @@ def test_validate_threads_and_jobs_reject_values_below_one() -> None:
 
     validate_threads(1)
     validate_jobs(1)
+
+
+def test_validate_alignment_sample_headers_accepts_matching_read_group_samples(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    alignment = tmp_path / "s1.bam"
+    alignment.write_bytes(b"bam")
+
+    def fake_run(
+        command: list[str],
+        *,
+        check: bool,
+        capture_output: bool,
+        text: bool,
+    ) -> object:
+        assert command == ["samtools", "view", "-H", str(alignment)]
+        assert check is False
+        assert capture_output is True
+        assert text is True
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            stdout="@HD\tVN:1.6\n@RG\tID:rg1\tSM:s1\n@RG\tID:rg2\tSM:s1\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr("sprite_mask.validation.subprocess.run", fake_run)
+
+    validate_alignment_sample_headers([Sample("s1", "popA", alignment)])
+
+
+def test_validate_alignment_sample_headers_rejects_mismatched_read_group_samples(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    alignment = tmp_path / "s1.bam"
+    alignment.write_bytes(b"bam")
+
+    def fake_run(
+        command: list[str],
+        *,
+        check: bool,
+        capture_output: bool,
+        text: bool,
+    ) -> object:
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            stdout="@RG\tID:rg1\tSM:s1\n@RG\tID:rg2\tSM:s2\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr("sprite_mask.validation.subprocess.run", fake_run)
+
+    with pytest.raises(ValueError, match="do not match the sample_id: s2"):
+        validate_alignment_sample_headers([Sample("s1", "popA", alignment)])
+
+
+def test_validate_alignment_sample_headers_ignores_headers_without_read_group_samples(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    alignment = tmp_path / "s1.bam"
+    alignment.write_bytes(b"bam")
+
+    def fake_run(
+        command: list[str],
+        *,
+        check: bool,
+        capture_output: bool,
+        text: bool,
+    ) -> object:
+        return subprocess.CompletedProcess(command, 0, stdout="@HD\tVN:1.6\n", stderr="")
+
+    monkeypatch.setattr("sprite_mask.validation.subprocess.run", fake_run)
+
+    validate_alignment_sample_headers([Sample("s1", "popA", alignment)])
+
+
+def test_validate_alignment_sample_headers_reports_samtools_errors(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    alignment = tmp_path / "s1.bam"
+    alignment.write_bytes(b"bam")
+
+    def fake_run(
+        command: list[str],
+        *,
+        check: bool,
+        capture_output: bool,
+        text: bool,
+    ) -> object:
+        return subprocess.CompletedProcess(command, 1, stdout="", stderr="not a BAM\n")
+
+    monkeypatch.setattr("sprite_mask.validation.subprocess.run", fake_run)
+
+    with pytest.raises(RuntimeError, match="could not read alignment header[\\s\\S]*not a BAM"):
+        validate_alignment_sample_headers([Sample("s1", "popA", alignment)])
 
 
 def test_require_executables_reports_missing_tools(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -50,6 +50,9 @@ sample_1   popA        /path/sample_1.bam
 sample_2   popB        /path/sample_2.cram
 ```
 
+If BAM/CRAM read group sample names are present, they must match the
+corresponding `sample_id`.
+
 To build the same output from an all-sites VCF:
 
 ```bash
@@ -69,8 +72,9 @@ sample_1   popA
 sample_2   popB
 ```
 
-VCF mode expects all popfile samples to be present in the VCF. Records may carry
-VCF `FILTER` values; the input is assumed to have already been filtered as desired.
+VCF mode expects the popfile samples to match the VCF sample columns exactly.
+Records may carry VCF `FILTER` values; the input is assumed to have already been
+filtered as desired.
 When duplicate records share a `CHROM:POS`, a sample passes that base if any duplicate
 record has `FORMAT/DP >= --threshold`. Duplicate records must be contiguous, as in
 a coordinate-sorted VCF.

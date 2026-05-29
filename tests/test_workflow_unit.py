@@ -80,7 +80,7 @@ def test_required_tools_for_threshold_zero_omits_mosdepth(tmp_path: Path) -> Non
         targets_bed=tmp_path / "targets.bed",
     )
 
-    assert _required_tools(config) == ("bedtools", "bgzip", "tabix")
+    assert _required_tools(config) == ("samtools", "bedtools", "bgzip", "tabix")
 
 
 def test_required_tools_for_alignment_mode_includes_mosdepth(tmp_path: Path) -> None:
@@ -90,7 +90,7 @@ def test_required_tools_for_alignment_mode_includes_mosdepth(tmp_path: Path) -> 
         out_dir=tmp_path / "out",
     )
 
-    assert _required_tools(config) == ("mosdepth", "bedtools", "bgzip", "tabix")
+    assert _required_tools(config) == ("samtools", "mosdepth", "bedtools", "bgzip", "tabix")
 
 
 def test_run_workflow_alignment_mode_dispatches_and_cleans_work_files(
@@ -108,6 +108,10 @@ def test_run_workflow_alignment_mode_dispatches_and_cleans_work_files(
 
     monkeypatch.setattr("sprite_mask.workflow.read_samples", lambda _path: [sample])
     monkeypatch.setattr("sprite_mask.workflow.require_executables", lambda _names: None)
+    monkeypatch.setattr(
+        "sprite_mask.workflow.validate_alignment_sample_headers",
+        lambda _samples: None,
+    )
     monkeypatch.setattr(
         "sprite_mask.workflow._build_from_all_sites_vcf",
         lambda *_args: pytest.fail("VCF workflow should not be called"),

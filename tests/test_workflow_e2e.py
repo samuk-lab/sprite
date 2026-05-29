@@ -216,7 +216,9 @@ def require_fixture_and_tools(fixture_case: FixtureCase) -> None:
     if not fixture_case.samples_tsv.exists() or not fixture_case.targets_bed.exists():
         pytest.skip(f"1000 Genomes BAM fixture is not available: {fixture_case.name}")
     missing = [
-        tool for tool in ("mosdepth", "bedtools", "bgzip", "tabix") if shutil.which(tool) is None
+        tool
+        for tool in ("samtools", "mosdepth", "bedtools", "bgzip", "tabix")
+        if shutil.which(tool) is None
     ]
     if missing:
         pytest.skip(f"external workflow tool(s) unavailable: {', '.join(missing)}")
@@ -262,7 +264,9 @@ def run_sprite_mask(
         capture_output=True,
         text=True,
     )
-    assert "cohort.sprite.bed.gz" in completed.stdout
+    assert completed.stdout == ""
+    assert "[sprite] Analysis complete: wrote" in completed.stderr
+    assert "cohort.sprite.bed.gz" in completed.stderr
     return out_dir, work_dir
 
 

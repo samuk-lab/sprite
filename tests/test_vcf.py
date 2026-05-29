@@ -68,9 +68,28 @@ def test_build_population_counts_from_all_sites_vcf_requires_popfile_samples(
         "chr1\t1\t.\tA\t.\t.\t.\t.\tGT:DP\t0/0:10\n"
     )
 
-    with pytest.raises(ValueError, match="missing popfile sample"):
+    with pytest.raises(ValueError, match="popfile sample.*absent from VCF"):
         build_population_counts_from_all_sites_vcf(
             [Sample("s2", "popA")],
+            vcf,
+            tmp_path / "population_counts.bed",
+            threshold=5,
+        )
+
+
+def test_build_population_counts_from_all_sites_vcf_rejects_vcf_samples_absent_from_popfile(
+    tmp_path: Path,
+) -> None:
+    vcf = tmp_path / "all_sites.vcf"
+    vcf.write_text(
+        "##fileformat=VCFv4.2\n"
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\ts2\n"
+        "chr1\t1\t.\tA\t.\t.\t.\t.\tGT:DP\t0/0:10\t0/0:7\n"
+    )
+
+    with pytest.raises(ValueError, match="VCF sample.*absent from popfile: s2"):
+        build_population_counts_from_all_sites_vcf(
+            [Sample("s1", "popA")],
             vcf,
             tmp_path / "population_counts.bed",
             threshold=5,
@@ -287,7 +306,7 @@ def test_build_population_counts_from_all_sites_vcf_rejects_malformed_headers(
         ),
         (
             ["s1", "s2"],
-            [Sample("s2", "popA")],
+            [Sample("s1", "popA"), Sample("s2", "popA")],
             "chr1\t1\t.\tA\t.\t.\t.\t.\tGT:DP\t0/0:7\n",
             "fewer sample columns",
         ),

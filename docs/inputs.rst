@@ -28,6 +28,9 @@ Alignment paths may be absolute or relative. For relative paths, ``sprite``
 first checks the current value, then the path relative to the sample table's
 parent directory.
 
+When read group sample names are present in a BAM/CRAM header, each ``@RG``
+``SM`` value must match the ``sample_id`` for that alignment row.
+
 Popfile for all-sites VCF mode
 ==============================
 
@@ -53,7 +56,7 @@ All-sites VCF
 =============
 
 ``--all-sites-vcf`` must point to a VCF with a ``#CHROM`` header and sample
-columns. Every sample in ``--popfile`` must be present in the VCF.
+columns. The VCF sample columns and ``--popfile`` sample IDs must match exactly.
 
 For each record, ``sprite`` reads the ``DP`` field from the sample's
 ``FORMAT`` value. Missing DP values do not pass. Non-integer DP values are

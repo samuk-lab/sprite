@@ -23,51 +23,73 @@ from sprite_mask.validation import (
     ensure_parent_dirs,
     refuse_existing_outputs,
     require_executables,
+    validate_alignment_sample_headers,
     validate_jobs,
     validate_threads,
     validate_threshold,
     validate_vcf_inputs,
 )
-from sprite_mask.vcf import build_population_counts_from_all_sites_vcf
+from sprite_mask.vcf import build_population_counts_from_all_sites_vcf, validate_vcf_sample_names
 
 logger = logging.getLogger(__name__)
 
 
 def run_workflow(config: RunConfig) -> WorkflowOutputs:
+    mode = _workflow_mode(config)
+    logger.info("Analysis start: validating %s workflow inputs", mode)
+
     if isinstance(config, VcfRunConfig):
+        logger.info("Analysis validation: checking threshold and VCF input paths")
         validate_threshold(
             config.threshold,
             targets_bed=config.targets_bed,
             all_sites_vcf=config.all_sites_vcf,
         )
         validate_vcf_inputs(config.all_sites_vcf, config.popfile_path)
+        logger.info("Analysis input: reading population file %s", config.popfile_path)
         samples = read_popfile(config.popfile_path)
     else:
+        logger.info("Analysis validation: checking threshold and alignment run settings")
         validate_threshold(config.threshold, targets_bed=config.targets_bed)
         validate_threads(config.threads)
         validate_jobs(config.jobs)
+        logger.info("Analysis input: reading sample file %s", config.samples_path)
         samples = read_samples(config.samples_path)
 
-    require_executables(_required_tools(config))
+    _log_sample_summary(samples)
+    required_tools = _required_tools(config)
+    logger.info("Analysis validation: checking required tools: %s", ", ".join(required_tools))
+    require_executables(required_tools)
+    if isinstance(config, VcfRunConfig):
+        logger.info("Analysis validation: checking VCF sample columns against population file")
+        validate_vcf_sample_names(samples, config.all_sites_vcf)
+    else:
+        logger.info("Analysis validation: checking alignment headers against sample file")
+        validate_alignment_sample_headers(samples)
 
     outputs = workflow_output_paths(config.out_dir, config.threshold)
     final_paths = [
         outputs.population_count_bed_gz,
         outputs.population_count_bed_index,
     ]
+    logger.info("Analysis output: checking final output paths in %s", config.out_dir)
     refuse_existing_outputs(final_paths, force=config.force)
 
     if config.dry_run:
-        mode = "VCF" if isinstance(config, VcfRunConfig) else "alignment"
         logger.info(
-            "dry-run: would process %d sample(s) via %s mode with threshold %d",
+            "Analysis dry-run summary: would process %d sample(s) via %s mode with threshold %d",
             len(samples),
             mode,
             config.threshold,
         )
-        logger.info("dry-run: output would be written to %s", outputs.population_count_bed_gz)
+        logger.info(
+            "Analysis dry-run summary: output would be written to %s",
+            outputs.population_count_bed_gz,
+        )
+        logger.info("Analysis dry-run complete: no files were written")
         return outputs
 
+    logger.info("Analysis setup: preparing output and work directories")
     ensure_parent_dirs(final_paths)
     config.resolved_work_dir.mkdir(parents=True, exist_ok=True)
 
@@ -78,7 +100,16 @@ def run_workflow(config: RunConfig) -> WorkflowOutputs:
         _build_from_alignments(samples, config, generated_work_files)
 
     if not config.keep_work:
+        logger.info(
+            "Analysis cleanup: removing temporary work files from %s",
+            config.resolved_work_dir,
+        )
         _cleanup_work_files(generated_work_files, config.resolved_work_dir)
+    else:
+        logger.info("Analysis cleanup: keeping work directory %s", config.resolved_work_dir)
+
+    logger.info("Analysis complete: wrote %s", outputs.population_count_bed_gz)
+    logger.info("Analysis complete: wrote %s", outputs.population_count_bed_index)
 
     return outputs
 
@@ -99,6 +130,12 @@ def _build_from_all_sites_vcf(
         config.resolved_work_dir / f"cohort.d{config.threshold}.population_count_quantized.bed"
     )
     generated_work_files.append(population_count_bed)
+    logger.info("Analysis VCF: building population counts from %s", config.all_sites_vcf)
+    if config.targets_bed is not None:
+        logger.info(
+            "Analysis VCF: restricting population counts to targets in %s",
+            config.targets_bed,
+        )
     build_population_counts_from_all_sites_vcf(
         samples,
         config.all_sites_vcf,
@@ -109,6 +146,7 @@ def _build_from_all_sites_vcf(
     )
 
     outputs = workflow_output_paths(config.out_dir, config.threshold)
+    logger.info("Analysis VCF: preparing final indexed BED")
     _sort_bgzip_tabix_bed(population_count_bed, outputs.population_count_bed_gz)
 
 
@@ -123,6 +161,7 @@ def _build_from_alignments(
     multiinter_tsv = config.resolved_work_dir / f"cohort.d{config.threshold}.multiinter.tsv"
     generated_work_files.append(multiinter_tsv)
     sample_names = [sample.sample_id for sample in samples]
+    logger.info("Analysis alignments: combining %d sample pass BED(s)", len(passing_beds))
     if len(passing_beds) == 1:
         write_single_input_multiinter(passing_beds[0], sample_names[0], multiinter_tsv)
     else:
@@ -138,6 +177,7 @@ def _build_from_alignments(
         config.resolved_work_dir / f"cohort.d{config.threshold}.population_count_quantized.bed"
     )
     generated_work_files.append(population_count_bed)
+    logger.info("Analysis alignments: collapsing sample indicators to population counts")
     collapse_population_counts(
         samples,
         multiinter_tsv,
@@ -145,6 +185,7 @@ def _build_from_alignments(
         metadata=metadata,
     )
     outputs = workflow_output_paths(config.out_dir, config.threshold)
+    logger.info("Analysis alignments: preparing final indexed BED")
     _sort_bgzip_tabix_bed(population_count_bed, outputs.population_count_bed_gz)
 
 
@@ -160,18 +201,21 @@ def _required_tools(config: RunConfig) -> tuple[str, ...]:
     if isinstance(config, VcfRunConfig):
         return ("bgzip", "tabix")
     if config.threshold == 0:
-        return ("bedtools", "bgzip", "tabix")
-    return ("mosdepth", "bedtools", "bgzip", "tabix")
+        return ("samtools", "bedtools", "bgzip", "tabix")
+    return ("samtools", "mosdepth", "bedtools", "bgzip", "tabix")
 
 
 def _prepare_targets(config: RunConfig, generated_work_files: list[Path]) -> Path | None:
     if config.targets_bed is None:
+        logger.info("Analysis targets: no target BED provided")
         return None
 
     normalized = config.resolved_work_dir / "targets.3col.bed"
     sorted_merged = config.resolved_work_dir / "targets.3col.sorted.merged.bed"
     generated_work_files.extend([normalized, sorted_merged])
+    logger.info("Analysis targets: normalizing %s", config.targets_bed)
     normalize_targets_bed(config.targets_bed, normalized)
+    logger.info("Analysis targets: sorting and merging target intervals")
     sort_and_merge_bed(normalized, sorted_merged)
     return sorted_merged
 
@@ -182,6 +226,13 @@ def _make_sample_pass_beds(
     target_bed: Path | None,
     generated_work_files: list[Path],
 ) -> list[Path]:
+    logger.info(
+        "Analysis alignments: processing %d sample alignment(s) "
+        "with %d job(s) and %d thread(s) per sample",
+        len(samples),
+        min(config.jobs, len(samples)),
+        config.threads,
+    )
     if config.jobs == 1 or len(samples) == 1:
         results = [_make_sample_pass_bed(sample, config, target_bed) for sample in samples]
     else:
@@ -212,12 +263,16 @@ def _make_sample_pass_bed(
     if config.threshold == 0:
         if target_bed is None:
             raise ValueError("--threshold 0 requires --targets")
+        logger.info(
+            "Analysis sample %s: using target intervals because threshold is 0",
+            sample.sample_id,
+        )
         target_copy = Path(f"{sample_prefix}.pass.targets.bed")
         shutil.copyfile(target_bed, target_copy)
         generated_work_files.append(target_copy)
         return target_copy, None, generated_work_files
 
-    logger.info("processing sample %s", sample.sample_id)
+    logger.info("Analysis sample %s: running mosdepth", sample.sample_id)
     mosdepth_outputs = run_mosdepth(sample, config)
     generated_work_files.extend(
         [
@@ -231,14 +286,18 @@ def _make_sample_pass_bed(
 
     merged_pass_bed = Path(f"{sample_prefix}.pass.bed")
     generated_work_files.append(merged_pass_bed)
+    logger.info("Analysis sample %s: extracting pass intervals", sample.sample_id)
     extract_merged_pass_intervals(mosdepth_outputs.quantized_bed_gz, merged_pass_bed)
 
     if target_bed is None:
+        logger.info("Analysis sample %s: finished pass interval BED", sample.sample_id)
         return merged_pass_bed, mosdepth_outputs, generated_work_files
 
     clipped_pass_bed = Path(f"{sample_prefix}.pass.targets.bed")
     generated_work_files.append(clipped_pass_bed)
+    logger.info("Analysis sample %s: clipping pass intervals to targets", sample.sample_id)
     intersect_sort_merge(merged_pass_bed, target_bed, clipped_pass_bed)
+    logger.info("Analysis sample %s: finished targeted pass interval BED", sample.sample_id)
     return clipped_pass_bed, mosdepth_outputs, generated_work_files
 
 
@@ -263,6 +322,7 @@ def _sort_bgzip_tabix_bed(in_bed: Path, out_bed_gz: Path) -> None:
             body.write(line)
 
     try:
+        logger.info("Analysis output: sorting BED intervals for %s", out_bed_gz)
         with sorted_body_bed.open("w") as sorted_body_out:
             subprocess.run(
                 ["sort", "-k1,1", "-k2,2n", str(body_bed)],
@@ -277,7 +337,9 @@ def _sort_bgzip_tabix_bed(in_bed: Path, out_bed_gz: Path) -> None:
             for line in sorted_body:
                 sorted_out.write(line)
 
+        logger.info("Analysis output: compressing %s with bgzip", sorted_bed)
         subprocess.run(["bgzip", "-f", str(sorted_bed)], check=True)
+        logger.info("Analysis output: indexing %s with tabix", out_bed_gz)
         subprocess.run(["tabix", "-f", "-p", "bed", str(out_bed_gz)], check=True)
     finally:
         with suppress(FileNotFoundError):
@@ -297,3 +359,26 @@ def _cleanup_work_files(paths: list[Path], work_dir: Path) -> None:
 
     with suppress(OSError):
         work_dir.rmdir()
+
+
+def _workflow_mode(config: RunConfig) -> str:
+    if isinstance(config, VcfRunConfig):
+        return "VCF"
+    return "alignment"
+
+
+def _log_sample_summary(samples: list[Sample]) -> None:
+    populations: list[str] = []
+    seen_populations: set[str] = set()
+    for sample in samples:
+        if sample.population in seen_populations:
+            continue
+        populations.append(sample.population)
+        seen_populations.add(sample.population)
+
+    logger.info(
+        "Analysis input summary: loaded %d sample(s) across %d population(s): %s",
+        len(samples),
+        len(populations),
+        ", ".join(populations),
+    )
