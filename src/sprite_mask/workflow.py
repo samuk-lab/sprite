@@ -67,7 +67,7 @@ def run_workflow(config: RunConfig) -> WorkflowOutputs:
         logger.info("Analysis validation: checking alignment headers against sample file")
         validate_alignment_sample_headers(samples)
 
-    outputs = workflow_output_paths(config.out_dir, config.threshold)
+    outputs = workflow_output_paths(config.out_dir, config.threshold, config.output_prefix)
     final_paths = [
         outputs.population_count_bed_gz,
         outputs.population_count_bed_index,
@@ -145,7 +145,7 @@ def _build_from_all_sites_vcf(
         metadata=metadata,
     )
 
-    outputs = workflow_output_paths(config.out_dir, config.threshold)
+    outputs = workflow_output_paths(config.out_dir, config.threshold, config.output_prefix)
     logger.info("Analysis VCF: preparing final indexed BED")
     _sort_bgzip_tabix_bed(population_count_bed, outputs.population_count_bed_gz)
 
@@ -184,13 +184,19 @@ def _build_from_alignments(
         population_count_bed,
         metadata=metadata,
     )
-    outputs = workflow_output_paths(config.out_dir, config.threshold)
+    outputs = workflow_output_paths(config.out_dir, config.threshold, config.output_prefix)
     logger.info("Analysis alignments: preparing final indexed BED")
     _sort_bgzip_tabix_bed(population_count_bed, outputs.population_count_bed_gz)
 
 
-def workflow_output_paths(out_dir: Path, threshold: int) -> WorkflowOutputs:
-    population_count_bed_gz = out_dir / "cohort.sprite.bed.gz"
+def workflow_output_paths(
+    out_dir: Path,
+    threshold: int,
+    output_prefix: str = "sprite",
+) -> WorkflowOutputs:
+    if output_prefix == "":
+        raise ValueError("--output-prefix cannot be empty")
+    population_count_bed_gz = out_dir / f"{output_prefix}.bed.gz"
     return WorkflowOutputs(
         population_count_bed_gz=population_count_bed_gz,
         population_count_bed_index=Path(f"{population_count_bed_gz}.tbi"),

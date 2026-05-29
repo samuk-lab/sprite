@@ -48,5 +48,5 @@ Implementation overview
 
 The public CLI is defined in ``sprite_mask.cli``. Parsed arguments are converted
 to ``RunConfig`` and passed to ``run_workflow``. The workflow validates the input
-mode, runs either the BAM/CRAM or VCF builder, writes ``cohort.sprite.bed.gz``,
+mode, runs either the BAM/CRAM or VCF builder, writes ``sprite.bed.gz``,
 and creates the tabix index.

@@ -1,4 +1,5 @@
-# sprite
+``sprite``<img src="https://raw.githubusercontent.com/samuk-lab/sprite/master/docs/images/sprite_logo.png" align="right" width="20%">
+====================
 
 `sprite` is a CLI utility for building sparse quantized depth-threshold mask BEDs
 from a cohort of BAM/CRAM files or a prefiltered all-sites VCF. It is a companion
@@ -82,15 +83,18 @@ a coordinate-sorted VCF.
 
 Regardless of mode, sprite outputs two main files:
 
-- `.sprite.bed.gz`
-- `.sprite.bed.gz.tbi`
+- `sprite.bed.gz`
+- `sprite.bed.gz.tbi`
+
+Set `--output-prefix` to choose a different output filename prefix; `.bed.gz`
+is appended to the prefix.
 
 The final population BED output is sparse: intervals absent from the file are interpreted as
-zero passing samples per population. The `*.sprite.bed.gz` file
+zero passing samples per population. The `*.bed.gz` file
 includes comment-prefixed headers. The first header line contains JSON metadata
 with the output format, threshold, columns, and explicit population-column
 mappings/sample counts where applicable; the second header line is the column
-header, for example `#chrom	start	end	GBR	YRI`. The `*.sprite.bed.gz`
+header, for example `#chrom	start	end	GBR	YRI`. The `*.bed.gz`
 file is sorted, bgzip-compressed, and tabix-indexed.
 
 ## Test Data

@@ -8,10 +8,12 @@ Each successful run writes two final files to ``--out``:
 
 .. code-block:: text
 
-   cohort.sprite.bed.gz
-   cohort.sprite.bed.gz.tbi
+   sprite.bed.gz
+   sprite.bed.gz.tbi
 
 The BED is bgzip-compressed and indexed with ``tabix -p bed``.
+Set ``--output-prefix`` to choose a different output filename prefix; ``.bed.gz``
+is appended to the prefix.
 
 BED columns
 ===========

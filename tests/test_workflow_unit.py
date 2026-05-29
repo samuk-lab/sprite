@@ -134,7 +134,7 @@ def test_run_workflow_alignment_mode_dispatches_and_cleans_work_files(
 
     outputs = run_workflow(config)
 
-    assert outputs.population_count_bed_gz == tmp_path / "out" / "cohort.sprite.bed.gz"
+    assert outputs.population_count_bed_gz == tmp_path / "out" / "sprite.bed.gz"
     assert calls == [([sample], config)]
     assert not config.resolved_work_dir.exists()
 
@@ -437,7 +437,7 @@ def test_build_from_alignments_uses_single_input_multiinter_for_one_sample(
     def fake_sort(in_bed: Path, out_bed_gz: Path) -> None:
         calls.append("sort")
         assert in_bed.name == "cohort.d10.population_count_quantized.bed"
-        assert out_bed_gz == tmp_path / "out" / "cohort.sprite.bed.gz"
+        assert out_bed_gz == tmp_path / "out" / "sprite.bed.gz"
 
     monkeypatch.setattr("sprite_mask.workflow.write_single_input_multiinter", fake_single)
     monkeypatch.setattr(
@@ -574,7 +574,7 @@ def test_build_from_all_sites_vcf_writes_population_bed_and_metadata(
         "all_sites_vcf": str(vcf),
         "targets_bed": str(targets),
     }
-    assert calls["sort"] == (output_bed, tmp_path / "out" / "cohort.sprite.bed.gz")
+    assert calls["sort"] == (output_bed, tmp_path / "out" / "sprite.bed.gz")
 
 
 def test_sort_bgzip_tabix_bed_preserves_headers_sorts_body_and_removes_temps(
@@ -590,7 +590,7 @@ def test_sort_bgzip_tabix_bed_preserves_headers_sorts_body_and_removes_temps(
         "\n"
         "chr1\t0\t1\t1\n"
     )
-    out_bed_gz = tmp_path / "out" / "cohort.sprite.bed.gz"
+    out_bed_gz = tmp_path / "out" / "sprite.bed.gz"
 
     def fake_run(
         command: list[str],
@@ -635,9 +635,9 @@ def test_sort_bgzip_tabix_bed_preserves_headers_sorts_body_and_removes_temps(
             "chr2\t5\t6\t1\n"
         )
     assert Path(f"{out_bed_gz}.tbi").read_text() == "index"
-    assert not (tmp_path / "out" / "cohort.sprite.bed").exists()
-    assert not (tmp_path / "out" / "cohort.sprite.body").exists()
-    assert not (tmp_path / "out" / "cohort.sprite.sorted_body").exists()
+    assert not (tmp_path / "out" / "sprite.bed").exists()
+    assert not (tmp_path / "out" / "sprite.bed.body").exists()
+    assert not (tmp_path / "out" / "sprite.bed.sorted_body").exists()
 
 
 def test_cleanup_work_files_removes_known_files_and_empty_work_dir(tmp_path: Path) -> None:
@@ -672,7 +672,7 @@ def test_full_all_sites_run_workflow_rejects_existing_outputs(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    population_bed = tmp_path / "out" / "cohort.sprite.bed.gz"
+    population_bed = tmp_path / "out" / "sprite.bed.gz"
     population_bed.parent.mkdir()
     population_bed.write_text("old")
     vcf = tmp_path / "all_sites.vcf"

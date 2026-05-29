@@ -163,8 +163,8 @@ def test_ensure_parent_dirs_creates_all_parent_directories(tmp_path: Path) -> No
 
 
 def test_refuse_existing_outputs_rejects_existing_without_force(tmp_path: Path) -> None:
-    existing = tmp_path / "cohort.sprite.bed.gz"
-    missing = tmp_path / "cohort.sprite.bed.gz.tbi"
+    existing = tmp_path / "sprite.bed.gz"
+    missing = tmp_path / "sprite.bed.gz.tbi"
     existing.write_text("old")
 
     with pytest.raises(FileExistsError, match=str(existing)):
@@ -172,7 +172,7 @@ def test_refuse_existing_outputs_rejects_existing_without_force(tmp_path: Path) 
 
 
 def test_refuse_existing_outputs_allows_existing_with_force(tmp_path: Path) -> None:
-    existing = tmp_path / "cohort.sprite.bed.gz"
+    existing = tmp_path / "sprite.bed.gz"
     existing.write_text("old")
 
     refuse_existing_outputs([existing], force=True)

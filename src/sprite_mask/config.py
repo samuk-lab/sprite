@@ -20,6 +20,7 @@ class AlignmentRunConfig:
     keep_work: bool = False
     force: bool = False
     dry_run: bool = False
+    output_prefix: str = "sprite"
 
     @property
     def resolved_work_dir(self) -> Path:
@@ -37,6 +38,7 @@ class VcfRunConfig:
     keep_work: bool = False
     force: bool = False
     dry_run: bool = False
+    output_prefix: str = "sprite"
 
     @property
     def resolved_work_dir(self) -> Path:

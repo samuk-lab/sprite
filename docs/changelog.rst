@@ -10,5 +10,5 @@ Highlights:
 
 * Build sparse population-count BEDs from BAM/CRAM cohorts.
 * Build the same output from prefiltered all-sites VCF ``FORMAT/DP`` values.
-* Write bgzipped and tabix-indexed ``cohort.sprite.bed.gz`` output.
+* Write bgzipped and tabix-indexed ``sprite.bed.gz`` output.
 * Include JSON metadata and population column headers in the output BED.

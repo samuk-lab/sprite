@@ -21,8 +21,8 @@ Expected outputs:
 
 .. code-block:: text
 
-   results/chr20_smoke/cohort.sprite.bed.gz
-   results/chr20_smoke/cohort.sprite.bed.gz.tbi
+   results/chr20_smoke/sprite.bed.gz
+   results/chr20_smoke/sprite.bed.gz.tbi
 
 Keep intermediate files
 =======================
@@ -63,7 +63,7 @@ Because the final BED is tabix-indexed, genomic slices can be queried directly:
 
 .. code-block:: console
 
-   tabix results/chr20_smoke/cohort.sprite.bed.gz chr20:10000000-10010000
+   tabix results/chr20_smoke/sprite.bed.gz chr20:10000000-10010000
 
 BED coordinates are 0-based and half-open, while tabix region strings are
 1-based inclusive.

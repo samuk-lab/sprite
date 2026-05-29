@@ -154,7 +154,7 @@ def test_cli_workflow_multichromosome_fixture_outputs_expected_counts(tmp_path: 
     require_fixture_and_tools(fixture_case)
     out_dir, work_dir = run_sprite_mask(tmp_path, fixture_case, keep_work=True)
 
-    population_count_bed_gz = out_dir / "cohort.sprite.bed.gz"
+    population_count_bed_gz = out_dir / "sprite.bed.gz"
     population_count_bed_index = Path(f"{population_count_bed_gz}.tbi")
 
     assert sorted(path.name for path in out_dir.iterdir()) == [
@@ -197,7 +197,7 @@ def test_cli_workflow_smoke_fixture_writes_only_indexed_population_bed(tmp_path:
     require_fixture_and_tools(fixture_case)
     out_dir, work_dir = run_sprite_mask(tmp_path, fixture_case, keep_work=False, threads=1)
 
-    population_count_bed_gz = out_dir / "cohort.sprite.bed.gz"
+    population_count_bed_gz = out_dir / "sprite.bed.gz"
     output_names = sorted(path.name for path in out_dir.iterdir())
     assert output_names == [
         population_count_bed_gz.name,
@@ -266,7 +266,7 @@ def run_sprite_mask(
     )
     assert completed.stdout == ""
     assert "[sprite] Analysis complete: wrote" in completed.stderr
-    assert "cohort.sprite.bed.gz" in completed.stderr
+    assert "sprite.bed.gz" in completed.stderr
     return out_dir, work_dir
 
 

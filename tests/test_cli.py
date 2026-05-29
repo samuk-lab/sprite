@@ -66,9 +66,9 @@ def test_main_all_sites_vcf_writes_indexed_population_bed(
     assert_sprite_progress(captured.err, "Analysis start: validating VCF workflow inputs")
     assert_sprite_progress(captured.err, "Analysis VCF: building population counts")
     assert_sprite_progress(captured.err, "Analysis complete: wrote")
-    assert "cohort.sprite.bed.gz" in captured.err
+    assert "sprite.bed.gz" in captured.err
 
-    population_bed = out_dir / "cohort.sprite.bed.gz"
+    population_bed = out_dir / "sprite.bed.gz"
     population_index = Path(f"{population_bed}.tbi")
     assert population_bed.exists()
     assert population_index.exists()
@@ -107,8 +107,8 @@ def test_main_builds_alignment_run_config(
         nonlocal seen_config
         seen_config = config
         return WorkflowOutputs(
-            population_count_bed_gz=tmp_path / "out" / "cohort.sprite.bed.gz",
-            population_count_bed_index=tmp_path / "out" / "cohort.sprite.bed.gz.tbi",
+            population_count_bed_gz=tmp_path / "out" / "sprite.bed.gz",
+            population_count_bed_index=tmp_path / "out" / "sprite.bed.gz.tbi",
         )
 
     monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
@@ -146,6 +146,7 @@ def test_main_builds_alignment_run_config(
     assert seen_config is not None
     assert seen_config.samples_path == tmp_path / "samples.tsv"
     assert seen_config.threshold == 30
+    assert seen_config.output_prefix == "sprite"
     assert seen_config.threads == 4
     assert seen_config.jobs == 2
     assert seen_config.targets_bed == tmp_path / "targets.bed"
@@ -159,6 +160,43 @@ def test_main_builds_alignment_run_config(
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == ""
+
+
+def test_main_accepts_output_prefix(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    seen_config = None
+
+    def fake_run_workflow(config: object) -> WorkflowOutputs:
+        nonlocal seen_config
+        seen_config = config
+        return WorkflowOutputs(
+            population_count_bed_gz=tmp_path / "out" / "custom.bed.gz",
+            population_count_bed_index=tmp_path / "out" / "custom.bed.gz.tbi",
+        )
+
+    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+
+    status = main(
+        [
+            "from-vcf",
+            "--all-sites-vcf",
+            str(tmp_path / "all_sites.vcf.gz"),
+            "--popfile",
+            str(tmp_path / "popfile.tsv"),
+            "--threshold",
+            "30",
+            "--out",
+            str(tmp_path / "out"),
+            "--output-prefix",
+            "custom",
+        ]
+    )
+
+    assert status == 0
+    assert seen_config is not None
+    assert seen_config.output_prefix == "custom"
 
 
 def test_main_reports_subprocess_errors(
@@ -235,8 +273,8 @@ def test_main_dry_run_skips_execution_and_returns_zero(
     def fake_run_workflow(config: object) -> WorkflowOutputs:
         calls.append(config)
         return WorkflowOutputs(
-            population_count_bed_gz=tmp_path / "out" / "cohort.sprite.bed.gz",
-            population_count_bed_index=tmp_path / "out" / "cohort.sprite.bed.gz.tbi",
+            population_count_bed_gz=tmp_path / "out" / "sprite.bed.gz",
+            population_count_bed_index=tmp_path / "out" / "sprite.bed.gz.tbi",
         )
 
     monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)

@@ -25,7 +25,7 @@ Required for every run
     ``--targets`` because no genome-wide coordinate file is supplied.
 
 **--out PATH**
-    Output directory for the final ``cohort.sprite.bed.gz`` and tabix index.
+    Output directory for the final ``sprite.bed.gz`` and tabix index.
 
 Required input mode
 ===================
@@ -55,13 +55,18 @@ Shared optional arguments
     three columns, sorted, and merged before sample pass intervals are clipped.
     In VCF mode, only bases contained by the target intervals are emitted.
 
+**--output-prefix TEXT**
+    Output file prefix within ``--out``. The default is ``sprite``, producing
+    ``sprite.bed.gz`` and ``sprite.bed.gz.tbi``. ``.bed.gz`` is appended to
+    custom prefixes.
+
 **--keep-work**
     Keep intermediate files in the working directory. By default, generated
     work files are removed after a successful run.
 
 **--force**
     Overwrite existing final outputs. Without this flag, ``sprite`` refuses to
-    replace ``cohort.sprite.bed.gz`` or ``cohort.sprite.bed.gz.tbi``.
+    replace ``sprite.bed.gz`` or ``sprite.bed.gz.tbi``.
 
 **--version**
     Print the installed ``sprite`` version and exit.

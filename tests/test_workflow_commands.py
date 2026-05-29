@@ -81,11 +81,18 @@ def test_workflow_output_paths(tmp_path: Path) -> None:
     outputs = workflow_output_paths(tmp_path / "results", 30)
 
     assert outputs.population_count_bed_gz == (
-        tmp_path / "results" / "cohort.sprite.bed.gz"
+        tmp_path / "results" / "sprite.bed.gz"
     )
     assert outputs.population_count_bed_index == (
-        tmp_path / "results" / "cohort.sprite.bed.gz.tbi"
+        tmp_path / "results" / "sprite.bed.gz.tbi"
     )
+
+
+def test_workflow_output_paths_accepts_prefix(tmp_path: Path) -> None:
+    outputs = workflow_output_paths(tmp_path / "results", 30, "custom")
+
+    assert outputs.population_count_bed_gz == tmp_path / "results" / "custom.bed.gz"
+    assert outputs.population_count_bed_index == tmp_path / "results" / "custom.bed.gz.tbi"
 
 
 def test_required_tools_for_vcf_mode_omits_mosdepth(tmp_path: Path) -> None:

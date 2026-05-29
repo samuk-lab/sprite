@@ -39,6 +39,7 @@ def _cmd_from_alignments(args: argparse.Namespace) -> int:
         samples_path=Path(args.samples),
         threshold=args.threshold,
         out_dir=Path(args.out),
+        output_prefix=args.output_prefix,
         work_dir=Path(args.work) if args.work else None,
         threads=args.threads,
         jobs=args.jobs,
@@ -61,6 +62,7 @@ def _cmd_from_vcf(args: argparse.Namespace) -> int:
         popfile_path=Path(args.popfile),
         threshold=args.threshold,
         out_dir=Path(args.out),
+        output_prefix=args.output_prefix,
         work_dir=Path(args.work) if args.work else None,
         targets_bed=Path(args.targets) if args.targets else None,
         keep_work=args.keep_work,
@@ -72,7 +74,7 @@ def _cmd_from_vcf(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="sprite", description="build cohort depth mask BEDs")
+    parser = argparse.ArgumentParser(prog="sprite", description="build depth mask BEDs")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
 
     subparsers = parser.add_subparsers(metavar="COMMAND")
@@ -86,6 +88,11 @@ def build_parser() -> argparse.ArgumentParser:
 def _add_common_run_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--threshold", required=True, type=int, help="minimum passing depth")
     p.add_argument("--out", required=True, help="output directory")
+    p.add_argument(
+        "--output-prefix",
+        default="sprite",
+        help="output file prefix within --out; .bed.gz is appended",
+    )
     p.add_argument("--work", help="working directory; defaults to <out>/work")
     p.add_argument("--targets", help="optional BED regions to include")
     p.add_argument("--keep-work", action="store_true", help="keep intermediate files")
