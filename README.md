@@ -9,7 +9,7 @@ of pi, dxy, Watterson's theta, and Tajima's D.
 
 The package is pre-release alpha pending validation, but will be distributed on bioconda as `sprite-mask` (just `sprite` was taken!).
 
-## Install (pre-rplease instructions)
+## Install (pre-release instructions)
 
 ### 1. Make a clean environment
 mamba create -n sprite python=3.11 pip git -c conda-forge
