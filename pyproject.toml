@@ -7,7 +7,7 @@ name = "sprite-mask"
 version = "0.1.0"
 description = "Build sparse depth-threshold mask BEDs from BAM/CRAM cohorts with mosdepth and bedtools."
 readme = "README.md"
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.10,<3.15"
 license = "MIT"
 authors = [
   { name = "sprite-mask contributors" },
@@ -36,7 +36,7 @@ where = ["src"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py310"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
@@ -46,7 +46,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 addopts = "--capture=sys"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.10"
 files = ["src"]
 warn_unused_configs = true
 disallow_untyped_defs = true
