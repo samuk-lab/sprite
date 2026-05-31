@@ -166,7 +166,9 @@ def _build_from_alignments_parser(subparsers: argparse._SubParsersAction) -> Non
     p.add_argument("--max-dp", type=int, help="maximum depth to pass a site")
     p.add_argument("--exclude-flag", type=int, help="SAM FLAG bits to exclude reads")
     p.add_argument("--reference", help="FASTA reference for CRAM inputs")
-    p.add_argument("--strict-depth", action="store_true", help="precise per-base depth counting (slower)")
+    p.add_argument(
+        "--strict-depth", action="store_true", help="precise per-base depth counting (slower)"
+    )
     p.set_defaults(subcommand=_cmd_from_alignments)
 
 

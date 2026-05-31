@@ -22,7 +22,7 @@ def test_run_mosdepth_sets_quantize_env_and_returns_outputs(
     sample = Sample("s1", "popA", tmp_path / "s1.bam")
     config = AlignmentRunConfig(
         samples_path=tmp_path / "samples.tsv",
-        threshold=10,
+        min_dp=10,
         out_dir=tmp_path / "out",
         work_dir=tmp_path / "work",
     )
@@ -71,7 +71,7 @@ def test_run_mosdepth_rejects_missing_expected_outputs(
     sample = Sample("s1", "popA", tmp_path / "s1.bam")
     config = AlignmentRunConfig(
         samples_path=tmp_path / "samples.tsv",
-        threshold=10,
+        min_dp=10,
         out_dir=tmp_path / "out",
         work_dir=tmp_path / "work",
     )
@@ -88,7 +88,7 @@ def test_run_mosdepth_rejects_missing_expected_outputs(
 def test_build_mosdepth_command_requires_alignment(tmp_path: Path) -> None:
     config = AlignmentRunConfig(
         samples_path=tmp_path / "samples.tsv",
-        threshold=10,
+        min_dp=10,
         out_dir=tmp_path / "out",
     )
 
