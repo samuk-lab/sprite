@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import gzip
 import json
 import re
@@ -20,6 +21,20 @@ def test_root_help_starts_with_banner_and_version() -> None:
     help_text = build_parser().format_help()
 
     assert help_text.startswith(f"{HELP_BANNER}\nsprite {__version__}\n\nusage:")
+
+
+def test_from_alignments_help_describes_fast_mode_replacement() -> None:
+    parser = build_parser()
+    subparsers = next(
+        action for action in parser._actions if isinstance(action, argparse._SubParsersAction)
+    )
+
+    help_text = subparsers.choices["from-alignments"].format_help()
+    normalized_help = " ".join(help_text.split())
+
+    assert "--fast-mode" in help_text
+    assert "strict per-base depth counting is the default" in normalized_help
+    assert "--strict-depth" not in help_text
 
 
 def assert_sprite_progress(log_output: str, message: str) -> None:
@@ -143,7 +158,7 @@ def test_main_builds_alignment_run_config(
             "1796",
             "--reference",
             str(tmp_path / "ref.fa"),
-            "--strict-depth",
+            "--fast-mode",
             "--keep-work",
             "--force",
         ]
@@ -160,7 +175,7 @@ def test_main_builds_alignment_run_config(
     assert seen_config.min_mapq == 20
     assert seen_config.exclude_flag == 1796
     assert seen_config.reference == tmp_path / "ref.fa"
-    assert seen_config.strict_depth is True
+    assert seen_config.fast_mode is True
     assert seen_config.keep_work is True
     assert seen_config.force is True
 

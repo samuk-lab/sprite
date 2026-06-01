@@ -93,9 +93,10 @@ BAM/CRAM mode options
 **--reference PATH**
     FASTA reference for CRAM inputs.
 
-**--strict-depth**
-    Use precise per-base depth counting. Slower, but avoids the
-    approximations made by ``mosdepth --fast-mode``.
+**--fast-mode**
+    Opt into ``mosdepth --fast-mode``. Strict per-base depth counting is the
+    default, so the former ``--strict-depth`` flag is no longer needed. Fast
+    mode is quicker, but allows mosdepth's fast-mode approximations.
 
 Examples
 ========
