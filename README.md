@@ -72,7 +72,7 @@ A few things to know about VCF mode:
 
 - Every sample in the population file must appear in the VCF. VCF samples absent from the population file are ignored (with a warning).
 - Records may carry any `FILTER` value — the input is assumed to have been filtered as desired before running `sprite`.
-- A sample passes a site when `FORMAT/DP >= --min-dp` and, if supplied, `FORMAT/DP <= --max-dp`.
+- A sample passes a site when `FORMAT/DP >= --min-dp`, if supplied `FORMAT/DP <= --max-dp`, and, when `FORMAT/GT` is present, the genotype is not missing.
 - At duplicate `CHROM:POS` records, a sample passes a site if any duplicate passes the depth thresholds. Duplicates must be contiguous, as in a coordinate-sorted VCF.
 - By default, all record types are used (SNPs, indels, symbolic alleles, invariant sites). Pass `--snps-only` to exclude indel sites while retaining invariant sites.
 
