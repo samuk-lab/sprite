@@ -32,6 +32,7 @@ def build_population_counts_from_all_sites_vcf(
     output_bed: Path,
     *,
     threshold: int,
+    max_depth: int | None = None,
     targets_bed: Path | None = None,
     depth_field: str = "DP",
     snps_only: bool = False,
@@ -120,6 +121,7 @@ def build_population_counts_from_all_sites_vcf(
                 selected_sample_columns,
                 depth_index,
                 threshold,
+                max_depth,
                 all_sites_vcf,
                 line_number,
             )
@@ -571,6 +573,7 @@ def _update_sample_passes(
     selected_sample_columns: list[int],
     depth_index: int,
     threshold: int,
+    max_depth: int | None,
     path: Path,
     line_number: int,
 ) -> None:
@@ -585,6 +588,7 @@ def _update_sample_passes(
             fields[field_index],
             depth_index,
             threshold,
+            max_depth,
             path,
             line_number,
         )
@@ -594,6 +598,7 @@ def _sample_depth_passes(
     sample_field: str,
     depth_index: int,
     threshold: int,
+    max_depth: int | None,
     path: Path,
     line_number: int,
 ) -> bool:
@@ -608,9 +613,10 @@ def _sample_depth_passes(
         return False
 
     try:
-        return int(depth_text) >= threshold
+        depth = int(depth_text)
     except ValueError as error:
         raise ValueError(f"{path}:{line_number} has non-integer sample DP") from error
+    return depth >= threshold and (max_depth is None or depth <= max_depth)
 
 
 def _sample_integer_format_value(

@@ -51,6 +51,7 @@ def run_workflow(config: RunConfig) -> WorkflowOutputs:
         logger.info("Analysis validation: checking threshold and VCF input paths")
         validate_threshold(
             config.min_dp,
+            max_threshold=config.max_dp,
             targets_bed=config.mask_bed,
             all_sites_vcf=config.all_sites_vcf,
         )
@@ -66,7 +67,11 @@ def run_workflow(config: RunConfig) -> WorkflowOutputs:
         config, alignment_metadata = _resolve_alignment_thresholds(config, samples)
         logger.info("Analysis validation: checking threshold")
         assert config.min_dp is not None
-        validate_threshold(config.min_dp, targets_bed=config.mask_bed)
+        validate_threshold(
+            config.min_dp,
+            max_threshold=config.max_dp,
+            targets_bed=config.mask_bed,
+        )
 
     _log_sample_summary(samples)
     required_tools = _required_tools(config)
@@ -208,8 +213,9 @@ def _build_from_all_sites_vcf(
     config: VcfRunConfig,
     generated_work_files: list[Path],
 ) -> None:
-    metadata = {
+    metadata: dict[str, object] = {
         "min_dp": config.min_dp,
+        "max_dp": config.max_dp,
         "sample_count": len(samples),
         "popfile": str(config.popfile_path),
         "all_sites_vcf": str(config.all_sites_vcf),
@@ -231,6 +237,7 @@ def _build_from_all_sites_vcf(
         config.all_sites_vcf,
         population_count_bed,
         threshold=config.min_dp,
+        max_depth=config.max_dp,
         targets_bed=config.mask_bed,
         snps_only=config.snps_only,
         metadata=metadata,

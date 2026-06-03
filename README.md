@@ -56,6 +56,7 @@ sprite from-vcf \
   --all-sites-vcf all_sites.vcf.gz \
   --popfile populations.tsv \
   --min-dp 10 \
+  --max-dp 80 \
   --out results
 ```
 
@@ -71,7 +72,8 @@ A few things to know about VCF mode:
 
 - Every sample in the population file must appear in the VCF. VCF samples absent from the population file are ignored (with a warning).
 - Records may carry any `FILTER` value — the input is assumed to have been filtered as desired before running `sprite`.
-- At duplicate `CHROM:POS` records, a sample passes a site if any duplicate has `FORMAT/DP ≥ --min-dp`. Duplicates must be contiguous, as in a coordinate-sorted VCF.
+- A sample passes a site when `FORMAT/DP >= --min-dp` and, if supplied, `FORMAT/DP <= --max-dp`.
+- At duplicate `CHROM:POS` records, a sample passes a site if any duplicate passes the depth thresholds. Duplicates must be contiguous, as in a coordinate-sorted VCF.
 - By default, all record types are used (SNPs, indels, symbolic alleles, invariant sites). Pass `--snps-only` to exclude indel sites while retaining invariant sites.
 
 ## Output

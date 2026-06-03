@@ -283,6 +283,8 @@ def test_main_from_vcf_accepts_snps_only(
             str(tmp_path / "popfile.tsv"),
             "--min-dp",
             "30",
+            "--max-dp",
+            "80",
             "--out",
             str(tmp_path / "out"),
             "--snps-only",
@@ -292,6 +294,7 @@ def test_main_from_vcf_accepts_snps_only(
     assert status == 0
     assert seen_config is not None
     assert seen_config.snps_only is True
+    assert seen_config.max_dp == 80
 
 
 def test_main_reports_subprocess_errors(

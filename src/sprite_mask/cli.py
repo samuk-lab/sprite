@@ -87,6 +87,7 @@ def _cmd_from_vcf(args: argparse.Namespace) -> int:
         popfile_path=Path(args.popfile),
         min_dp=args.min_dp,
         out_dir=Path(args.out),
+        max_dp=args.max_dp,
         output_prefix=args.output_prefix,
         work_dir=Path(args.work) if args.work else None,
         mask_bed=Path(args.mask) if args.mask else None,
@@ -210,6 +211,11 @@ def _build_from_vcf_parser(subparsers: argparse._SubParsersAction) -> None:  # t
     )
     p.add_argument("--popfile", required=True, help="sample/population TSV (sample_id, population)")
     _add_common_run_args(p)
+    p.add_argument(
+        "--max-dp",
+        type=int,
+        help="maximum depth to pass a site",
+    )
     p.add_argument(
         "--snps-only",
         action="store_true",

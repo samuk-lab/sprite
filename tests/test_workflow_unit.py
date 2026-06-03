@@ -661,6 +661,7 @@ def test_build_from_all_sites_vcf_writes_population_bed_and_metadata(
         popfile_path=popfile,
         min_dp=5,
         out_dir=tmp_path / "out",
+        max_dp=12,
         work_dir=tmp_path / "work",
         mask_bed=targets,
     )
@@ -673,6 +674,7 @@ def test_build_from_all_sites_vcf_writes_population_bed_and_metadata(
         output_bed: Path,
         *,
         threshold: int,
+        max_depth: int | None,
         targets_bed: Path | None,
         snps_only: bool,
         metadata: dict[str, object],
@@ -682,6 +684,7 @@ def test_build_from_all_sites_vcf_writes_population_bed_and_metadata(
             all_sites_vcf,
             output_bed,
             threshold,
+            max_depth,
             targets_bed,
             snps_only,
             metadata,
@@ -704,10 +707,11 @@ def test_build_from_all_sites_vcf_writes_population_bed_and_metadata(
     output_bed = tmp_path / "work" / "cohort.d5.population_count_quantized.bed"
     assert generated == [output_bed]
     build_call = calls["build"]
-    assert build_call[:5] == (samples, vcf, output_bed, 5, targets)
-    assert build_call[5] is False
-    assert build_call[6] == {
+    assert build_call[:6] == (samples, vcf, output_bed, 5, 12, targets)
+    assert build_call[6] is False
+    assert build_call[7] == {
         "min_dp": 5,
+        "max_dp": 12,
         "sample_count": 1,
         "popfile": str(popfile),
         "all_sites_vcf": str(vcf),

@@ -81,6 +81,7 @@ When you have a prefiltered all-sites VCF with per-sample DP values:
      --all-sites-vcf validation/1000g_20sample_highcov_4chrom_subset/1000g_20samples_highcov_4chroms.all_sites.bam_call.trim_alt.vcf.gz \
      --popfile validation/1000g_20sample_highcov_4chrom_subset/sample_populations.tsv \
      --min-dp 10 \
+     --max-dp 80 \
      --mask validation/1000g_20sample_highcov_4chrom_subset/targets.bed \
      --out results/vcf_mode \
      --work work/vcf_mode

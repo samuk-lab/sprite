@@ -35,6 +35,7 @@ class VcfRunConfig:
     popfile_path: Path
     min_dp: int
     out_dir: Path
+    max_dp: int | None = None
     work_dir: Path | None = None
     mask_bed: Path | None = None
     keep_work: bool = False
