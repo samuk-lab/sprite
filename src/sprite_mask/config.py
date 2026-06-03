@@ -17,6 +17,7 @@ class AlignmentRunConfig:
     min_mapq: int | None = None
     max_dp: int | None = None
     exclude_flag: int | None = None
+    include_flag: int | None = None
     reference: Path | None = None
     fast_mode: bool = False
     keep_work: bool = False

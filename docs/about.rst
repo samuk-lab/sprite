@@ -48,9 +48,10 @@ All-sites VCF mode
 In VCF mode, ``sprite`` reads ``FORMAT/DP`` values directly from an all-sites
 VCF. A sample passes a base when its DP value is greater than or equal to
 ``--min-dp`` and, if ``--max-dp`` is supplied, less than or equal to
-``--max-dp``. Duplicate records at the same ``CHROM:POS`` are merged with OR
-semantics per sample: if any duplicate passes the depth thresholds, the sample
-passes that base. Duplicate records must be contiguous, as in a
+``--max-dp``. When ``FORMAT/GT`` is present, the genotype must also be
+non-missing. Duplicate records at the same ``CHROM:POS`` are merged with OR
+semantics per sample: if any duplicate passes the depth and genotype checks,
+the sample passes that base. Duplicate records must be contiguous, as in a
 coordinate-sorted VCF.
 
 Sparse output

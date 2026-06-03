@@ -115,11 +115,13 @@ def build_population_counts_from_all_sites_vcf(
                 current_passes = [False] * len(samples)
 
             depth_index = _depth_format_index(fields, depth_field, all_sites_vcf, line_number)
+            genotype_index = _optional_genotype_format_index(fields)
             _update_sample_passes(
                 current_passes,
                 fields,
                 selected_sample_columns,
                 depth_index,
+                genotype_index,
                 threshold,
                 max_depth,
                 all_sites_vcf,
@@ -507,6 +509,17 @@ def _optional_depth_format_index(fields: list[str], depth_field: str = "DP") -> 
         return None
 
 
+def _optional_genotype_format_index(fields: list[str]) -> int | None:
+    format_text = fields[8]
+    if format_text in {"", "."}:
+        return None
+    format_fields = format_text.split(":")
+    try:
+        return format_fields.index("GT")
+    except ValueError:
+        return None
+
+
 def _parse_info_values(info_text: str) -> dict[str, list[str]]:
     if info_text in {"", "."}:
         return {}
@@ -572,6 +585,7 @@ def _update_sample_passes(
     fields: list[str],
     selected_sample_columns: list[int],
     depth_index: int,
+    genotype_index: int | None,
     threshold: int,
     max_depth: int | None,
     path: Path,
@@ -587,6 +601,7 @@ def _update_sample_passes(
         passes[selected_index] = _sample_depth_passes(
             fields[field_index],
             depth_index,
+            genotype_index,
             threshold,
             max_depth,
             path,
@@ -597,6 +612,7 @@ def _update_sample_passes(
 def _sample_depth_passes(
     sample_field: str,
     depth_index: int,
+    genotype_index: int | None,
     threshold: int,
     max_depth: int | None,
     path: Path,
@@ -616,7 +632,19 @@ def _sample_depth_passes(
         depth = int(depth_text)
     except ValueError as error:
         raise ValueError(f"{path}:{line_number} has non-integer sample DP") from error
+    if genotype_index is not None and _sample_genotype_is_missing(parts, genotype_index):
+        return False
     return depth >= threshold and (max_depth is None or depth <= max_depth)
+
+
+def _sample_genotype_is_missing(parts: list[str], genotype_index: int) -> bool:
+    if genotype_index >= len(parts):
+        return True
+    genotype_text = parts[genotype_index]
+    if genotype_text in {"", "."}:
+        return True
+    alleles = genotype_text.replace("|", "/").split("/")
+    return any(allele in {"", "."} for allele in alleles)
 
 
 def _sample_integer_format_value(

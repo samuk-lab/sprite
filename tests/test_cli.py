@@ -158,6 +158,8 @@ def test_main_builds_alignment_run_config(
             "20",
             "--exclude-flag",
             "1796",
+            "--include-flag",
+            "2",
             "--reference",
             str(tmp_path / "ref.fa"),
             "--fast-mode",
@@ -177,6 +179,7 @@ def test_main_builds_alignment_run_config(
     assert seen_config.variants_vcf == tmp_path / "variants.vcf.gz"
     assert seen_config.min_mapq == 20
     assert seen_config.exclude_flag == 1796
+    assert seen_config.include_flag == 2
     assert seen_config.reference == tmp_path / "ref.fa"
     assert seen_config.fast_mode is True
     assert seen_config.keep_work is True

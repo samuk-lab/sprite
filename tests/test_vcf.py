@@ -423,6 +423,53 @@ def test_build_population_counts_from_all_sites_vcf_omits_missing_and_zero_depth
     assert out.read_text().splitlines()[1:] == ["#chrom\tstart\tend\tpopA"]
 
 
+def test_build_population_counts_from_all_sites_vcf_omits_missing_genotypes_with_depth(
+    tmp_path: Path,
+) -> None:
+    samples = [
+        Sample("s1", "popA"),
+        Sample("s2", "popA"),
+        Sample("s3", "popB"),
+    ]
+    vcf = tmp_path / "all_sites.vcf"
+    vcf.write_text(
+        "##fileformat=VCFv4.2\n"
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\ts2\ts3\n"
+        "chr1\t1\t.\tA\t.\t.\t.\t.\tGT:DP\t./.:10\t.|.:11\t0/0:12\n"
+        "chr1\t2\t.\tC\t.\t.\t.\t.\tGT:DP\t0/.:10\t0|0:11\t.:12\n"
+        "chr1\t3\t.\tG\t.\t.\t.\t.\tGT:DP\t./.:10\t.:11\t.|.:12\n"
+    )
+    out = tmp_path / "population_counts.bed"
+
+    build_population_counts_from_all_sites_vcf(samples, vcf, out, threshold=5)
+
+    assert out.read_text().splitlines()[1:] == [
+        "#chrom\tstart\tend\tpopA\tpopB",
+        "chr1\t0\t1\t0\t1",
+        "chr1\t1\t2\t1\t0",
+    ]
+
+
+def test_build_population_counts_from_all_sites_vcf_supports_depth_only_format(
+    tmp_path: Path,
+) -> None:
+    samples = [Sample("s1", "popA")]
+    vcf = tmp_path / "all_sites.vcf"
+    vcf.write_text(
+        "##fileformat=VCFv4.2\n"
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts1\n"
+        "chr1\t1\t.\tA\t.\t.\t.\t.\tDP\t7\n"
+    )
+    out = tmp_path / "population_counts.bed"
+
+    build_population_counts_from_all_sites_vcf(samples, vcf, out, threshold=5)
+
+    assert out.read_text().splitlines()[1:] == [
+        "#chrom\tstart\tend\tpopA",
+        "chr1\t0\t1\t1",
+    ]
+
+
 def test_build_population_counts_from_all_sites_vcf_with_no_records_writes_only_header(
     tmp_path: Path,
 ) -> None:

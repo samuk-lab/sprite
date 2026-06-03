@@ -71,6 +71,7 @@ def _cmd_from_alignments(args: argparse.Namespace) -> int:
         min_mapq=args.min_mapq,
         max_dp=args.max_dp,
         exclude_flag=args.exclude_flag,
+        include_flag=args.include_flag,
         reference=Path(args.reference) if args.reference else None,
         fast_mode=args.fast_mode,
         keep_work=args.keep_work,
@@ -187,6 +188,7 @@ def _build_from_alignments_parser(subparsers: argparse._SubParsersAction) -> Non
         help="maximum depth to pass a site; defaults from --variants-vcf when available",
     )
     p.add_argument("--exclude-flag", type=int, help="SAM FLAG bits to exclude reads")
+    p.add_argument("--include-flag", type=int, help="SAM FLAG bits required to include reads")
     p.add_argument("--reference", help="FASTA reference for CRAM inputs")
     p.add_argument(
         "--fast-mode",
