@@ -61,10 +61,11 @@ absent from ``--popfile`` produce a warning and are ignored.
 
 For each record, ``sprite`` reads the ``DP`` field from the sample's
 ``FORMAT`` value. Missing DP values do not pass. Non-integer DP values are
-rejected. Records may carry any ``FILTER`` value; the file is assumed to have
-been filtered as desired. Duplicate ``CHROM:POS`` records are merged with OR
-semantics per sample, but duplicates must be contiguous, as in a
-coordinate-sorted VCF.
+rejected. A sample passes when DP is at least ``--min-dp`` and, if
+``--max-dp`` is supplied, no greater than ``--max-dp``. Records may carry any
+``FILTER`` value; the file is assumed to have been filtered as desired.
+Duplicate ``CHROM:POS`` records are merged with OR semantics per sample, but
+duplicates must be contiguous, as in a coordinate-sorted VCF.
 
 Variants-only VCF for BAM/CRAM mode
 ===================================

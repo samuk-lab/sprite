@@ -11,11 +11,17 @@ from sprite_mask.models import Sample
 def validate_threshold(
     threshold: int,
     *,
+    max_threshold: int | None = None,
     targets_bed: Path | None = None,
     all_sites_vcf: Path | None = None,
 ) -> None:
     if threshold < 0:
-        raise ValueError("--threshold must be a non-negative integer")
+        raise ValueError("--min-dp must be a non-negative integer")
+    if max_threshold is not None:
+        if max_threshold < 0:
+            raise ValueError("--max-dp must be a non-negative integer")
+        if max_threshold < threshold:
+            raise ValueError("--max-dp must be greater than or equal to --min-dp")
     if threshold == 0 and targets_bed is None and all_sites_vcf is None:
         raise ValueError("--min-dp 0 requires --mask because no genome.txt is required")
 

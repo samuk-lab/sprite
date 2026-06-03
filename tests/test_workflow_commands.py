@@ -188,6 +188,8 @@ def test_cli_parser_from_vcf_subcommand(tmp_path: Path) -> None:
             str(tmp_path / "popfile.tsv"),
             "--min-dp",
             "30",
+            "--max-dp",
+            "80",
             "--out",
             str(tmp_path / "out"),
             "--snps-only",
@@ -197,4 +199,5 @@ def test_cli_parser_from_vcf_subcommand(tmp_path: Path) -> None:
     assert args.all_sites_vcf == str(tmp_path / "all_sites.vcf.gz")
     assert args.popfile == str(tmp_path / "popfile.tsv")
     assert args.min_dp == 30
+    assert args.max_dp == 80
     assert args.snps_only is True

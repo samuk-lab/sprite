@@ -99,8 +99,9 @@ BAM/CRAM mode options
     ``--variants-vcf`` when available.
 
 **--max-dp INTEGER**
-    Maximum depth to pass a site. In BAM/CRAM mode, defaults from
-    ``--variants-vcf`` when available.
+    Maximum depth to pass a site. In VCF mode, omitted means no upper
+    depth bound. In BAM/CRAM mode, defaults from ``--variants-vcf`` when
+    available.
 
 **--exclude-flag INTEGER**
     SAM FLAG bits to exclude reads.
@@ -139,6 +140,7 @@ All-sites VCF mode:
      --all-sites-vcf validation/cohort.all_sites.vcf.gz \
      --popfile validation/sample_populations.tsv \
      --min-dp 10 \
+     --max-dp 80 \
      --mask validation/targets.bed \
      --out results \
      --work work

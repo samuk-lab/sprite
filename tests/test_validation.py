@@ -21,6 +21,13 @@ from sprite_mask.validation import (
 def test_validate_threshold_rejects_negative() -> None:
     with pytest.raises(ValueError, match="non-negative"):
         validate_threshold(-1)
+    with pytest.raises(ValueError, match="non-negative"):
+        validate_threshold(1, max_threshold=-1)
+
+
+def test_validate_threshold_rejects_max_below_min() -> None:
+    with pytest.raises(ValueError, match="greater than or equal"):
+        validate_threshold(10, max_threshold=9)
 
 
 def test_validate_threshold_zero_requires_targets_or_vcf(tmp_path: Path) -> None:
