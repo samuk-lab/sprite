@@ -78,6 +78,8 @@ def build_mosdepth_command(sample: Sample, config: AlignmentRunConfig, prefix: P
         command.extend(["--mapq", str(config.min_mapq)])
     if config.exclude_flag is not None:
         command.extend(["--flag", str(config.exclude_flag)])
+    if config.include_flag is not None:
+        command.extend(["--include-flag", str(config.include_flag)])
     if config.reference is not None:
         command.extend(["--fasta", str(config.reference)])
 

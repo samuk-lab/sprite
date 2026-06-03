@@ -106,6 +106,10 @@ BAM/CRAM mode options
 **--exclude-flag INTEGER**
     SAM FLAG bits to exclude reads.
 
+**--include-flag INTEGER**
+    SAM FLAG bits required to include reads. Passed through to
+    ``mosdepth --include-flag``.
+
 **--reference PATH**
     FASTA reference for CRAM inputs.
 

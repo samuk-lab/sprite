@@ -20,6 +20,7 @@ def test_build_mosdepth_command_default_omits_fast_mode(tmp_path: Path) -> None:
         threads=4,
         min_mapq=20,
         exclude_flag=1796,
+        include_flag=2,
         reference=tmp_path / "ref.fa",
     )
 
@@ -36,6 +37,8 @@ def test_build_mosdepth_command_default_omits_fast_mode(tmp_path: Path) -> None:
         "20",
         "--flag",
         "1796",
+        "--include-flag",
+        "2",
         "--fasta",
         str(tmp_path / "ref.fa"),
         str(tmp_path / "work" / "s1.d30"),
