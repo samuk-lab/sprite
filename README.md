@@ -5,6 +5,8 @@
 
 Population count masks let you correctly compute the denominators of π, d<sub>xy</sub>, Watterson's θ, and Tajima's D when working from a variants-only VCF — callable sites are counted per population rather than collapsed into a single cohort-wide pass/fail.
 
+Sprite is inspired by [mop](https://github.com/RILAB/mop), [clam](https://github.com/cademirch/clam), and makes heavy use of [mosdepth](https://github.com/brentp/mosdepth).
+
 > **Note:** `sprite` is pre-release (alpha) and pending validation. It will be distributed on Bioconda as `sprite-mask` once stable.
 
 ## Installation
