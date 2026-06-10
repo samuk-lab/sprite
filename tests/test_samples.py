@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from sprite_mask.models import Sample
-from sprite_mask.samples import (
+from wisp_mask.models import Sample
+from wisp_mask.samples import (
     read_popfile,
     read_samples,
     validate_sample_populations,

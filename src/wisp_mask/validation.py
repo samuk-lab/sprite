@@ -5,7 +5,7 @@ import subprocess
 from collections.abc import Iterable
 from pathlib import Path
 
-from sprite_mask.models import Sample
+from wisp_mask.models import Sample
 
 
 def validate_threshold(

@@ -8,20 +8,20 @@ from contextlib import suppress
 from dataclasses import replace
 from pathlib import Path
 
-from sprite_mask.bedio import extract_merged_pass_intervals, normalize_targets_bed
-from sprite_mask.bedtools import (
+from wisp_mask.bedio import extract_merged_pass_intervals, normalize_targets_bed
+from wisp_mask.bedtools import (
     intersect_sort_merge,
     run_multiinter,
     sort_and_merge_bed,
     subtract_sort_merge,
     write_single_input_multiinter,
 )
-from sprite_mask.collapse import collapse_population_counts
-from sprite_mask.config import AlignmentRunConfig, RunConfig, VcfRunConfig
-from sprite_mask.models import MosdepthOutputs, Sample, WorkflowOutputs
-from sprite_mask.mosdepth import run_mosdepth
-from sprite_mask.samples import read_popfile, read_samples
-from sprite_mask.validation import (
+from wisp_mask.collapse import collapse_population_counts
+from wisp_mask.config import AlignmentRunConfig, RunConfig, VcfRunConfig
+from wisp_mask.models import MosdepthOutputs, Sample, WorkflowOutputs
+from wisp_mask.mosdepth import run_mosdepth
+from wisp_mask.samples import read_popfile, read_samples
+from wisp_mask.validation import (
     ensure_parent_dirs,
     refuse_existing_outputs,
     require_executables,
@@ -32,7 +32,7 @@ from sprite_mask.validation import (
     validate_variants_vcf_input,
     validate_vcf_inputs,
 )
-from sprite_mask.vcf import (
+from wisp_mask.vcf import (
     build_population_counts_from_all_sites_vcf,
     estimate_alignment_thresholds_from_variants_vcf,
     validate_vcf_sample_names,
@@ -301,7 +301,7 @@ def _build_from_alignments(
 def workflow_output_paths(
     out_dir: Path,
     threshold: int,
-    output_prefix: str = "sprite",
+    output_prefix: str = "wisp",
 ) -> WorkflowOutputs:
     if output_prefix == "":
         raise ValueError("--output-prefix cannot be empty")

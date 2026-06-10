@@ -233,7 +233,7 @@ FAST_MODE_INTEGRATION_FIXTURE = FixtureCase(
 def test_cli_workflow_multichromosome_fixture_outputs_expected_counts(tmp_path: Path) -> None:
     fixture_case = INTEGRATION_FIXTURE
     require_fixture_and_tools(fixture_case)
-    out_dir, work_dir = run_sprite_mask(tmp_path, fixture_case, keep_work=True)
+    out_dir, work_dir = run_wisp_mask(tmp_path, fixture_case, keep_work=True)
 
     assert_population_count_output_matches_fixture(out_dir, fixture_case)
     assert_expected_work_files_exist(work_dir, fixture_case)
@@ -242,7 +242,7 @@ def test_cli_workflow_multichromosome_fixture_outputs_expected_counts(tmp_path: 
 def test_cli_workflow_fast_mode_preserves_previous_fixture_counts(tmp_path: Path) -> None:
     fixture_case = FAST_MODE_INTEGRATION_FIXTURE
     require_fixture_and_tools(fixture_case)
-    out_dir, work_dir = run_sprite_mask(
+    out_dir, work_dir = run_wisp_mask(
         tmp_path,
         fixture_case,
         keep_work=True,
@@ -257,7 +257,7 @@ def assert_population_count_output_matches_fixture(
     out_dir: Path,
     fixture_case: FixtureCase,
 ) -> None:
-    population_count_bed_gz = out_dir / "sprite.bed.gz"
+    population_count_bed_gz = out_dir / "wisp.bed.gz"
     population_count_bed_index = Path(f"{population_count_bed_gz}.tbi")
 
     assert sorted(path.name for path in out_dir.iterdir()) == [
@@ -296,9 +296,9 @@ def assert_population_count_output_matches_fixture(
 def test_cli_workflow_smoke_fixture_writes_only_indexed_population_bed(tmp_path: Path) -> None:
     fixture_case = SMOKE_FIXTURE
     require_fixture_and_tools(fixture_case)
-    out_dir, work_dir = run_sprite_mask(tmp_path, fixture_case, keep_work=False, threads=1)
+    out_dir, work_dir = run_wisp_mask(tmp_path, fixture_case, keep_work=False, threads=1)
 
-    population_count_bed_gz = out_dir / "sprite.bed.gz"
+    population_count_bed_gz = out_dir / "wisp.bed.gz"
     output_names = sorted(path.name for path in out_dir.iterdir())
     assert output_names == [
         population_count_bed_gz.name,
@@ -325,7 +325,7 @@ def require_fixture_and_tools(fixture_case: FixtureCase) -> None:
         pytest.skip(f"external workflow tool(s) unavailable: {', '.join(missing)}")
 
 
-def run_sprite_mask(
+def run_wisp_mask(
     tmp_path: Path,
     fixture_case: FixtureCase,
     *,
@@ -339,7 +339,7 @@ def run_sprite_mask(
     command = [
         sys.executable,
         "-m",
-        "sprite_mask.cli",
+        "wisp_mask.cli",
         "from-alignments",
         "--samples",
         str(fixture_case.samples_tsv),
@@ -369,8 +369,8 @@ def run_sprite_mask(
         text=True,
     )
     assert completed.stdout == ""
-    assert "[sprite] Analysis complete: wrote" in completed.stderr
-    assert "sprite.bed.gz" in completed.stderr
+    assert "[wisp] Analysis complete: wrote" in completed.stderr
+    assert "wisp.bed.gz" in completed.stderr
     return out_dir, work_dir
 
 
@@ -396,7 +396,7 @@ def read_count_bed_header(path: Path) -> dict[str, object]:
         metadata: dict[str, object] | None = None
         for line in handle:
             fields = line.rstrip("\n").split("\t")
-            if fields[0] == "#sprite_mask_metadata":
+            if fields[0] == "#wisp_mask_metadata":
                 metadata = json.loads(fields[1])
                 continue
             if fields[0] == "#chrom":

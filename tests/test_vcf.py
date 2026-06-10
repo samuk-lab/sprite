@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from sprite_mask.models import Sample
-from sprite_mask.vcf import (
+from wisp_mask.models import Sample
+from wisp_mask.vcf import (
     build_population_counts_from_all_sites_vcf,
     estimate_alignment_thresholds_from_variants_vcf,
     validate_vcf_sample_names,

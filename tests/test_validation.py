@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from sprite_mask.models import Sample
-from sprite_mask.validation import (
+from wisp_mask.models import Sample
+from wisp_mask.validation import (
     ensure_parent_dirs,
     refuse_existing_outputs,
     require_executables,
@@ -87,7 +87,7 @@ def test_validate_alignment_sample_headers_accepts_matching_read_group_samples(
             stderr="",
         )
 
-    monkeypatch.setattr("sprite_mask.validation.subprocess.run", fake_run)
+    monkeypatch.setattr("wisp_mask.validation.subprocess.run", fake_run)
 
     validate_alignment_sample_headers([Sample("s1", "popA", alignment)])
 
@@ -113,7 +113,7 @@ def test_validate_alignment_sample_headers_rejects_mismatched_read_group_samples
             stderr="",
         )
 
-    monkeypatch.setattr("sprite_mask.validation.subprocess.run", fake_run)
+    monkeypatch.setattr("wisp_mask.validation.subprocess.run", fake_run)
 
     with pytest.raises(ValueError, match="do not match the sample_id: s2"):
         validate_alignment_sample_headers([Sample("s1", "popA", alignment)])
@@ -135,7 +135,7 @@ def test_validate_alignment_sample_headers_ignores_headers_without_read_group_sa
     ) -> object:
         return subprocess.CompletedProcess(command, 0, stdout="@HD\tVN:1.6\n", stderr="")
 
-    monkeypatch.setattr("sprite_mask.validation.subprocess.run", fake_run)
+    monkeypatch.setattr("wisp_mask.validation.subprocess.run", fake_run)
 
     validate_alignment_sample_headers([Sample("s1", "popA", alignment)])
 
@@ -156,7 +156,7 @@ def test_validate_alignment_sample_headers_reports_samtools_errors(
     ) -> object:
         return subprocess.CompletedProcess(command, 1, stdout="", stderr="not a BAM\n")
 
-    monkeypatch.setattr("sprite_mask.validation.subprocess.run", fake_run)
+    monkeypatch.setattr("wisp_mask.validation.subprocess.run", fake_run)
 
     with pytest.raises(RuntimeError, match="could not read alignment header[\\s\\S]*not a BAM"):
         validate_alignment_sample_headers([Sample("s1", "popA", alignment)])
@@ -168,7 +168,7 @@ def test_require_executables_reports_missing_tools(monkeypatch: pytest.MonkeyPat
             return "/usr/bin/present"
         return None
 
-    monkeypatch.setattr("sprite_mask.validation.shutil.which", fake_which)
+    monkeypatch.setattr("wisp_mask.validation.shutil.which", fake_which)
 
     with pytest.raises(RuntimeError, match="missing1, missing2"):
         require_executables(["present", "missing1", "missing2"])
@@ -185,8 +185,8 @@ def test_ensure_parent_dirs_creates_all_parent_directories(tmp_path: Path) -> No
 
 
 def test_refuse_existing_outputs_rejects_existing_without_force(tmp_path: Path) -> None:
-    existing = tmp_path / "sprite.bed.gz"
-    missing = tmp_path / "sprite.bed.gz.tbi"
+    existing = tmp_path / "wisp.bed.gz"
+    missing = tmp_path / "wisp.bed.gz.tbi"
     existing.write_text("old")
 
     with pytest.raises(FileExistsError, match=str(existing)):
@@ -194,7 +194,7 @@ def test_refuse_existing_outputs_rejects_existing_without_force(tmp_path: Path) 
 
 
 def test_refuse_existing_outputs_allows_existing_with_force(tmp_path: Path) -> None:
-    existing = tmp_path / "sprite.bed.gz"
+    existing = tmp_path / "wisp.bed.gz"
     existing.write_text("old")
 
     refuse_existing_outputs([existing], force=True)

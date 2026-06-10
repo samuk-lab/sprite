@@ -4,8 +4,8 @@ import subprocess
 from collections.abc import Sequence
 from pathlib import Path
 
-from sprite_mask.bedio import iter_bed3
-from sprite_mask.commands import run_pipeline
+from wisp_mask.bedio import iter_bed3
+from wisp_mask.commands import run_pipeline
 
 
 def sort_and_merge_bed(in_bed: Path, out_bed: Path) -> Path:

@@ -14,9 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 
-project = "sprite"
-copyright = "2026, sprite contributors"
-author = "sprite contributors"
+project = "wisp"
+copyright = "2026, wisp contributors"
+author = "wisp contributors"
 
 with (ROOT / "pyproject.toml").open("rb") as handle:
     release = tomllib.load(handle)["project"]["version"]
@@ -42,27 +42,27 @@ html_theme_options = {
 html_static_path = []
 html_title = f"{project} {release}"
 
-htmlhelp_basename = "spritedoc"
+htmlhelp_basename = "wispdoc"
 
 latex_documents = [
     (
         master_doc,
-        "sprite.tex",
-        "sprite Documentation",
+        "wisp.tex",
+        "wisp Documentation",
         author,
         "manual",
     ),
 ]
 
-man_pages = [(master_doc, "sprite", "sprite Documentation", [author], 1)]
+man_pages = [(master_doc, "wisp", "wisp Documentation", [author], 1)]
 
 texinfo_documents = [
     (
         master_doc,
-        "sprite",
-        "sprite Documentation",
+        "wisp",
+        "wisp Documentation",
         author,
-        "sprite",
+        "wisp",
         "Build sparse depth-threshold mask BEDs from cohort alignment data or all-sites VCFs.",
         "Miscellaneous",
     ),

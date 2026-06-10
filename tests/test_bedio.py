@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from sprite_mask.bedio import (
+from wisp_mask.bedio import (
     count_bed_sites,
     extract_merged_pass_intervals,
     extract_pass_intervals,

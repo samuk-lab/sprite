@@ -1,9 +1,9 @@
 About
 *****
 
-``sprite`` creates population count masks for population genomic workflows.
+``wisp`` creates population count masks for population genomic workflows.
 Where a conventional depth mask gives a single cohort-wide pass/fail per
-site, ``sprite`` reports how many samples in each population clear the depth
+site, ``wisp`` reports how many samples in each population clear the depth
 threshold.
 
 Why population count masks?
@@ -29,13 +29,13 @@ Input modes
 BAM/CRAM mode
 -------------
 
-In alignment mode, ``sprite`` runs ``mosdepth`` once per sample using a
+In alignment mode, ``wisp`` runs ``mosdepth`` once per sample using a
 two-bin quantization: below threshold and at-or-above threshold. It extracts
 the passing intervals, optionally clips them to a mask BED, intersects all
 sample pass BEDs with ``bedtools multiinter``, and assembles them into a
 population count mask.
 
-An optional variants-only VCF can modify this alignment workflow. ``sprite``
+An optional variants-only VCF can modify this alignment workflow. ``wisp``
 can estimate omitted depth and mapping-quality thresholds from the VCF, and
 it subtracts indel, structural-variant, breakend, and multi-nucleotide
 polymorphism spans from every sample pass BED. Because the final BED is
@@ -45,7 +45,7 @@ zero passing samples in every population.
 All-sites VCF mode
 ------------------
 
-In VCF mode, ``sprite`` reads ``FORMAT/DP`` values directly from an all-sites
+In VCF mode, ``wisp`` reads ``FORMAT/DP`` values directly from an all-sites
 VCF. A sample passes a base when its DP value is greater than or equal to
 ``--min-dp`` and, if ``--max-dp`` is supplied, less than or equal to
 ``--max-dp``. When ``FORMAT/GT`` is present, the genotype must also be
@@ -57,6 +57,6 @@ coordinate-sorted VCF.
 Sparse output
 =============
 
-``sprite`` omits intervals where all population counts are zero. Consumers
+``wisp`` omits intervals where all population counts are zero. Consumers
 should treat missing intervals as zero passing samples per population, not as
 unknown or skipped.

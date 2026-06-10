@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from sprite_mask.commands import run_pipeline
+from wisp_mask.commands import run_pipeline
 
 
 def test_run_pipeline_requires_at_least_two_commands(tmp_path: Path) -> None:

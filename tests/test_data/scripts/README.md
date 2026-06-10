@@ -24,5 +24,5 @@ below the warning threshold.
 The scripts read remote CRAM files. htslib may need to cache reference slices
 for those CRAMs, and those slices can be larger than GitHub's per-file limit.
 By default, the cache is written outside the fixture directory at
-`${XDG_CACHE_HOME:-$HOME/.cache}/sprite-test-data/ref_cache`. Override
+`${XDG_CACHE_HOME:-$HOME/.cache}/wisp-test-data/ref_cache`. Override
 `REF_CACHE_DIR` if you want a different local cache location.

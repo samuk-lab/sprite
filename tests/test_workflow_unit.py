@@ -8,10 +8,10 @@ from typing import TextIO
 
 import pytest
 
-from sprite_mask.config import AlignmentRunConfig, VcfRunConfig
-from sprite_mask.models import MosdepthOutputs, Sample
-from sprite_mask.validation import validate_vcf_inputs
-from sprite_mask.workflow import (
+from wisp_mask.config import AlignmentRunConfig, VcfRunConfig
+from wisp_mask.models import MosdepthOutputs, Sample
+from wisp_mask.validation import validate_vcf_inputs
+from wisp_mask.workflow import (
     _build_from_alignments,
     _build_from_all_sites_vcf,
     _cleanup_work_files,
@@ -108,14 +108,14 @@ def test_run_workflow_alignment_mode_dispatches_and_cleans_work_files(
     )
     calls: list[tuple[list[Sample], AlignmentRunConfig]] = []
 
-    monkeypatch.setattr("sprite_mask.workflow.read_samples", lambda _path: [sample])
-    monkeypatch.setattr("sprite_mask.workflow.require_executables", lambda _names: None)
+    monkeypatch.setattr("wisp_mask.workflow.read_samples", lambda _path: [sample])
+    monkeypatch.setattr("wisp_mask.workflow.require_executables", lambda _names: None)
     monkeypatch.setattr(
-        "sprite_mask.workflow.validate_alignment_sample_headers",
+        "wisp_mask.workflow.validate_alignment_sample_headers",
         lambda _samples: None,
     )
     monkeypatch.setattr(
-        "sprite_mask.workflow._build_from_all_sites_vcf",
+        "wisp_mask.workflow._build_from_all_sites_vcf",
         lambda *_args: pytest.fail("VCF workflow should not be called"),
     )
 
@@ -133,13 +133,13 @@ def test_run_workflow_alignment_mode_dispatches_and_cleans_work_files(
         generated_work_files.append(generated)
 
     monkeypatch.setattr(
-        "sprite_mask.workflow._build_from_alignments",
+        "wisp_mask.workflow._build_from_alignments",
         fake_build_from_alignments,
     )
 
     outputs = run_workflow(config)
 
-    assert outputs.population_count_bed_gz == tmp_path / "out" / "sprite.bed.gz"
+    assert outputs.population_count_bed_gz == tmp_path / "out" / "wisp.bed.gz"
     assert calls == [([sample], config)]
     assert not config.resolved_work_dir.exists()
 
@@ -207,8 +207,8 @@ def test_prepare_targets_normalizes_sorts_and_tracks_outputs(
         out_bed.write_text(in_bed.read_text())
         return out_bed
 
-    monkeypatch.setattr("sprite_mask.workflow.normalize_targets_bed", fake_normalize)
-    monkeypatch.setattr("sprite_mask.workflow.sort_and_merge_bed", fake_sort)
+    monkeypatch.setattr("wisp_mask.workflow.normalize_targets_bed", fake_normalize)
+    monkeypatch.setattr("wisp_mask.workflow.sort_and_merge_bed", fake_sort)
 
     config = AlignmentRunConfig(
         samples_path=tmp_path / "samples.tsv",
@@ -273,7 +273,7 @@ def test_prepare_variant_exclusions_writes_and_merges_non_snp_regions(
         out_bed.write_text(in_bed.read_text())
         return out_bed
 
-    monkeypatch.setattr("sprite_mask.workflow.sort_and_merge_bed", fake_sort)
+    monkeypatch.setattr("wisp_mask.workflow.sort_and_merge_bed", fake_sort)
     generated: list[Path] = []
 
     exclusions = _prepare_variant_exclusions(config, generated)
@@ -343,8 +343,8 @@ def test_make_sample_pass_bed_without_targets_uses_merged_pass_bed(
         out_bed.write_text("chr1\t0\t10\n")
         return out_bed
 
-    monkeypatch.setattr("sprite_mask.workflow.run_mosdepth", fake_run_mosdepth)
-    monkeypatch.setattr("sprite_mask.workflow.extract_merged_pass_intervals", fake_extract)
+    monkeypatch.setattr("wisp_mask.workflow.run_mosdepth", fake_run_mosdepth)
+    monkeypatch.setattr("wisp_mask.workflow.extract_merged_pass_intervals", fake_extract)
 
     pass_bed, mosdepth_outputs, generated = _make_sample_pass_bed(
         Sample("s1", "popA", tmp_path / "s1.bam"),
@@ -381,11 +381,11 @@ def test_make_sample_pass_bed_with_targets_clips_merged_pass_bed(
     calls: list[tuple[Path, Path, Path]] = []
 
     monkeypatch.setattr(
-        "sprite_mask.workflow.run_mosdepth",
+        "wisp_mask.workflow.run_mosdepth",
         lambda _sample, _config: outputs,
     )
     monkeypatch.setattr(
-        "sprite_mask.workflow.extract_merged_pass_intervals",
+        "wisp_mask.workflow.extract_merged_pass_intervals",
         lambda _quantized, out_bed: out_bed.write_text("chr1\t0\t20\n") or out_bed,
     )
 
@@ -394,7 +394,7 @@ def test_make_sample_pass_bed_with_targets_clips_merged_pass_bed(
         out_bed.write_text("chr1\t5\t10\n")
         return out_bed
 
-    monkeypatch.setattr("sprite_mask.workflow.intersect_sort_merge", fake_intersect)
+    monkeypatch.setattr("wisp_mask.workflow.intersect_sort_merge", fake_intersect)
 
     pass_bed, returned_outputs, generated = _make_sample_pass_bed(
         Sample("s1", "popA", tmp_path / "s1.bam"),
@@ -427,9 +427,9 @@ def test_make_sample_pass_bed_removes_variant_exclusion_regions(
     variant_exclusions.write_text("chr1\t12\t14\n")
     calls: list[tuple[Path, Path, Path]] = []
 
-    monkeypatch.setattr("sprite_mask.workflow.run_mosdepth", lambda _sample, _config: outputs)
+    monkeypatch.setattr("wisp_mask.workflow.run_mosdepth", lambda _sample, _config: outputs)
     monkeypatch.setattr(
-        "sprite_mask.workflow.extract_merged_pass_intervals",
+        "wisp_mask.workflow.extract_merged_pass_intervals",
         lambda _quantized, out_bed: out_bed.write_text("chr1\t10\t20\n") or out_bed,
     )
 
@@ -438,7 +438,7 @@ def test_make_sample_pass_bed_removes_variant_exclusion_regions(
         out_bed.write_text("chr1\t10\t12\nchr1\t14\t20\n")
         return out_bed
 
-    monkeypatch.setattr("sprite_mask.workflow.subtract_sort_merge", fake_subtract)
+    monkeypatch.setattr("wisp_mask.workflow.subtract_sort_merge", fake_subtract)
 
     pass_bed, returned_outputs, generated = _make_sample_pass_bed(
         Sample("s1", "popA", tmp_path / "s1.bam"),
@@ -482,7 +482,7 @@ def test_make_sample_pass_beds_uses_parallel_jobs_and_tracks_work_files(
         sample_log = tmp_path / f"{sample.sample_id}.log"
         return pass_bed, None, [sample_log]
 
-    monkeypatch.setattr("sprite_mask.workflow._make_sample_pass_bed", fake_make_sample_pass_bed)
+    monkeypatch.setattr("wisp_mask.workflow._make_sample_pass_bed", fake_make_sample_pass_bed)
     generated: list[Path] = []
 
     pass_beds = _make_sample_pass_beds(samples, config, None, None, generated)
@@ -517,7 +517,7 @@ def test_make_sample_pass_beds_uses_sequential_path_for_one_job(
         visited.append(sample.sample_id)
         return tmp_path / f"{sample.sample_id}.pass.bed", None, []
 
-    monkeypatch.setattr("sprite_mask.workflow._make_sample_pass_bed", fake_make_sample_pass_bed)
+    monkeypatch.setattr("wisp_mask.workflow._make_sample_pass_bed", fake_make_sample_pass_bed)
 
     pass_beds = _make_sample_pass_beds(samples, config, None, None, [])
 
@@ -541,11 +541,11 @@ def test_build_from_alignments_uses_single_input_multiinter_for_one_sample(
     calls: list[str] = []
 
     monkeypatch.setattr(
-        "sprite_mask.workflow._prepare_targets",
+        "wisp_mask.workflow._prepare_targets",
         lambda _config, _generated: None,
     )
     monkeypatch.setattr(
-        "sprite_mask.workflow._make_sample_pass_beds",
+        "wisp_mask.workflow._make_sample_pass_beds",
         lambda _samples, _config, _target_bed, _variant_exclusion_bed, _generated: [pass_bed],
     )
 
@@ -573,15 +573,15 @@ def test_build_from_alignments_uses_single_input_multiinter_for_one_sample(
     def fake_sort(in_bed: Path, out_bed_gz: Path) -> None:
         calls.append("sort")
         assert in_bed.name == "cohort.d10.population_count_quantized.bed"
-        assert out_bed_gz == tmp_path / "out" / "sprite.bed.gz"
+        assert out_bed_gz == tmp_path / "out" / "wisp.bed.gz"
 
-    monkeypatch.setattr("sprite_mask.workflow.write_single_input_multiinter", fake_single)
+    monkeypatch.setattr("wisp_mask.workflow.write_single_input_multiinter", fake_single)
     monkeypatch.setattr(
-        "sprite_mask.workflow.run_multiinter",
+        "wisp_mask.workflow.run_multiinter",
         lambda *_args: pytest.fail("run_multiinter should not be called"),
     )
-    monkeypatch.setattr("sprite_mask.workflow.collapse_population_counts", fake_collapse)
-    monkeypatch.setattr("sprite_mask.workflow._sort_bgzip_tabix_bed", fake_sort)
+    monkeypatch.setattr("wisp_mask.workflow.collapse_population_counts", fake_collapse)
+    monkeypatch.setattr("wisp_mask.workflow._sort_bgzip_tabix_bed", fake_sort)
     generated: list[Path] = []
 
     _build_from_alignments([sample], config, generated)
@@ -612,11 +612,11 @@ def test_build_from_alignments_uses_bedtools_multiinter_for_multiple_samples(
     calls: list[tuple[list[Path], list[str], Path]] = []
 
     monkeypatch.setattr(
-        "sprite_mask.workflow._prepare_targets",
+        "wisp_mask.workflow._prepare_targets",
         lambda _config, _generated: None,
     )
     monkeypatch.setattr(
-        "sprite_mask.workflow._make_sample_pass_beds",
+        "wisp_mask.workflow._make_sample_pass_beds",
         lambda _samples, _config, _target_bed, _variant_exclusion_bed, _generated: pass_beds,
     )
 
@@ -625,15 +625,15 @@ def test_build_from_alignments_uses_bedtools_multiinter_for_multiple_samples(
         out_tsv.write_text("chrom\tstart\tend\tnum\tlist\ts1\ts2\n")
         return out_tsv
 
-    monkeypatch.setattr("sprite_mask.workflow.run_multiinter", fake_multi)
+    monkeypatch.setattr("wisp_mask.workflow.run_multiinter", fake_multi)
     monkeypatch.setattr(
-        "sprite_mask.workflow.collapse_population_counts",
+        "wisp_mask.workflow.collapse_population_counts",
         lambda _samples, _multiinter, output_bed, *, metadata: output_bed.write_text(
             "#chrom\tstart\tend\tpopA\tpopB\n"
         )
         or output_bed,
     )
-    monkeypatch.setattr("sprite_mask.workflow._sort_bgzip_tabix_bed", lambda *_args: None)
+    monkeypatch.setattr("wisp_mask.workflow._sort_bgzip_tabix_bed", lambda *_args: None)
 
     _build_from_alignments(samples, config, [])
 
@@ -696,10 +696,10 @@ def test_build_from_all_sites_vcf_writes_population_bed_and_metadata(
         calls["sort"] = (in_bed, out_bed_gz)
 
     monkeypatch.setattr(
-        "sprite_mask.workflow.build_population_counts_from_all_sites_vcf",
+        "wisp_mask.workflow.build_population_counts_from_all_sites_vcf",
         fake_build,
     )
-    monkeypatch.setattr("sprite_mask.workflow._sort_bgzip_tabix_bed", fake_sort)
+    monkeypatch.setattr("wisp_mask.workflow._sort_bgzip_tabix_bed", fake_sort)
     generated: list[Path] = []
 
     _build_from_all_sites_vcf(samples, config, generated)
@@ -718,7 +718,7 @@ def test_build_from_all_sites_vcf_writes_population_bed_and_metadata(
         "mask_bed": str(targets),
         "snps_only": False,
     }
-    assert calls["sort"] == (output_bed, tmp_path / "out" / "sprite.bed.gz")
+    assert calls["sort"] == (output_bed, tmp_path / "out" / "wisp.bed.gz")
 
 
 def test_sort_bgzip_tabix_bed_preserves_headers_sorts_body_and_removes_temps(
@@ -727,14 +727,14 @@ def test_sort_bgzip_tabix_bed_preserves_headers_sorts_body_and_removes_temps(
 ) -> None:
     in_bed = tmp_path / "population_count.bed"
     in_bed.write_text(
-        "#sprite_mask_metadata\t{}\n"
+        "#wisp_mask_metadata\t{}\n"
         "chrom\tstart\tend\tpopA\n"
         "chr2\t5\t6\t1\n"
         "chr1\t2\t3\t1\n"
         "\n"
         "chr1\t0\t1\t1\n"
     )
-    out_bed_gz = tmp_path / "out" / "sprite.bed.gz"
+    out_bed_gz = tmp_path / "out" / "wisp.bed.gz"
 
     def fake_run(
         command: list[str],
@@ -766,22 +766,22 @@ def test_sort_bgzip_tabix_bed_preserves_headers_sorts_body_and_removes_temps(
             return subprocess.CompletedProcess(command, 0)
         raise AssertionError(f"unexpected command: {command}")
 
-    monkeypatch.setattr("sprite_mask.workflow.subprocess.run", fake_run)
+    monkeypatch.setattr("wisp_mask.workflow.subprocess.run", fake_run)
 
     _sort_bgzip_tabix_bed(in_bed, out_bed_gz)
 
     with gzip.open(out_bed_gz, "rt") as handle:
         assert handle.read() == (
-            "#sprite_mask_metadata\t{}\n"
+            "#wisp_mask_metadata\t{}\n"
             "#chrom\tstart\tend\tpopA\n"
             "chr1\t0\t1\t1\n"
             "chr1\t2\t3\t1\n"
             "chr2\t5\t6\t1\n"
         )
     assert Path(f"{out_bed_gz}.tbi").read_text() == "index"
-    assert not (tmp_path / "out" / "sprite.bed").exists()
-    assert not (tmp_path / "out" / "sprite.bed.body").exists()
-    assert not (tmp_path / "out" / "sprite.bed.sorted_body").exists()
+    assert not (tmp_path / "out" / "wisp.bed").exists()
+    assert not (tmp_path / "out" / "wisp.bed.body").exists()
+    assert not (tmp_path / "out" / "wisp.bed.sorted_body").exists()
 
 
 def test_cleanup_work_files_removes_known_files_and_empty_work_dir(tmp_path: Path) -> None:
@@ -816,7 +816,7 @@ def test_full_all_sites_run_workflow_rejects_existing_outputs(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    population_bed = tmp_path / "out" / "sprite.bed.gz"
+    population_bed = tmp_path / "out" / "wisp.bed.gz"
     population_bed.parent.mkdir()
     population_bed.write_text("old")
     vcf = tmp_path / "all_sites.vcf"
@@ -827,7 +827,7 @@ def test_full_all_sites_run_workflow_rejects_existing_outputs(
     popfile = tmp_path / "popfile.tsv"
     popfile.write_text("sample_id\tpopulation\ns1\tpopA\n")
 
-    monkeypatch.setattr("sprite_mask.workflow.require_executables", lambda _names: None)
+    monkeypatch.setattr("wisp_mask.workflow.require_executables", lambda _names: None)
 
     with pytest.raises(FileExistsError, match="pass --force"):
         run_workflow(

@@ -3,12 +3,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from sprite_mask.bedtools import build_multiinter_command
-from sprite_mask.cli import build_parser
-from sprite_mask.config import AlignmentRunConfig, VcfRunConfig
-from sprite_mask.models import Sample
-from sprite_mask.mosdepth import build_mosdepth_command
-from sprite_mask.workflow import _required_tools, workflow_output_paths
+from wisp_mask.bedtools import build_multiinter_command
+from wisp_mask.cli import build_parser
+from wisp_mask.config import AlignmentRunConfig, VcfRunConfig
+from wisp_mask.models import Sample
+from wisp_mask.mosdepth import build_mosdepth_command
+from wisp_mask.workflow import _required_tools, workflow_output_paths
 
 
 def test_build_mosdepth_command_default_omits_fast_mode(tmp_path: Path) -> None:
@@ -98,10 +98,10 @@ def test_workflow_output_paths(tmp_path: Path) -> None:
     outputs = workflow_output_paths(tmp_path / "results", 30)
 
     assert outputs.population_count_bed_gz == (
-        tmp_path / "results" / "sprite.bed.gz"
+        tmp_path / "results" / "wisp.bed.gz"
     )
     assert outputs.population_count_bed_index == (
-        tmp_path / "results" / "sprite.bed.gz.tbi"
+        tmp_path / "results" / "wisp.bed.gz.tbi"
     )
 
 

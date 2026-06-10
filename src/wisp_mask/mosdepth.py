@@ -4,8 +4,8 @@ import os
 import subprocess
 from pathlib import Path
 
-from sprite_mask.config import AlignmentRunConfig
-from sprite_mask.models import MosdepthOutputs, Sample
+from wisp_mask.config import AlignmentRunConfig
+from wisp_mask.models import MosdepthOutputs, Sample
 
 
 def run_mosdepth(sample: Sample, config: AlignmentRunConfig) -> MosdepthOutputs:
