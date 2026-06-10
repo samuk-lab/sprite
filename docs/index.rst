@@ -1,17 +1,17 @@
-.. sprite documentation master file.
+.. wisp documentation master file.
 
 .. raw:: html
 
-   <div align="center"><h1>sprite 0.1.0</h1></div>
+   <div align="center"><h1>wisp 0.1.0</h1></div>
 
-.. image:: images/sprite_logo.png
+.. image:: images/wisp_logo.png
    :width: 200
    :align: center
 
-What is sprite?
+What is wisp?
 ===============
 
-``sprite`` is a command line tool for building population count masks: sparse,
+``wisp`` is a command line tool for building population count masks: sparse,
 population-level summaries of how many individuals have sufficient depth and
 mapping quality to call genotypes at sites across the genome.
 These masks can be produced from BAM/CRAM alignments or an all-sites VCF.
@@ -48,11 +48,11 @@ Population count masks let you correctly compute the denominators of π, d\
 VCF — callable sites are counted per population rather than collapsed into a
 single cohort-wide pass/fail.
 
-``sprite`` is designed for use with `pixy <https://pixy.readthedocs.io>`_,
+``wisp`` is designed for use with `pixy <https://pixy.readthedocs.io>`_,
 but works equally well on its own. Source code is on
-`GitHub <https://github.com/samuk-lab/sprite>`_.
+`GitHub <https://github.com/samuk-lab/wisp>`_.
 
-The tool produces the same ``sprite.bed.gz`` output from two input modes:
+The tool produces the same ``wisp.bed.gz`` output from two input modes:
 
 * BAM/CRAM alignments, using ``mosdepth`` to quantize each sample and
   ``bedtools multiinter`` to combine samples. In this mode, an optional

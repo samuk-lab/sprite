@@ -8,22 +8,21 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from sprite_mask import __version__
-from sprite_mask.config import AlignmentRunConfig, VcfRunConfig
-from sprite_mask.workflow import run_workflow
+from wisp_mask import __version__
+from wisp_mask.config import AlignmentRunConfig, VcfRunConfig
+from wisp_mask.workflow import run_workflow
 
-HELP_BANNER = """\
-                     █▄
-             ▄    ▀▀▄██▄
- ▄██▀█ ████▄ ████▄██ ██ ▄█▀█▄
- ▀███▄ ██ ██ ██   ██ ██ ██▄█▀
-█▄▄██▀▄████▀▄█▀  ▄██▄██▄▀█▄▄▄
-       ██
-       ▀
-"""
+HELP_BANNER = (
+    "        _           \n"
+    "__      _(_)___ _ __\n"
+    "\\ \\ /\\ / / / __| '_ \\\n"
+    " \\ V  V /| \\__ \\ |_) |\n"
+    "  \\_/\\_/ |_|___/ .__/\n"
+    "               |_|   "
+)
 
 
-class SpriteArgumentParser(argparse.ArgumentParser):
+class WispArgumentParser(argparse.ArgumentParser):
     def __init__(self, *args: Any, show_banner: bool = False, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._show_banner = show_banner
@@ -32,7 +31,7 @@ class SpriteArgumentParser(argparse.ArgumentParser):
         help_text = super().format_help()
         if not self._show_banner:
             return help_text
-        return f"{HELP_BANNER}\nsprite {__version__}\n\n{help_text}"
+        return f"{HELP_BANNER}\nwisp {__version__}\n\n{help_text}"
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -53,7 +52,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except Exception as error:
         if getattr(args, "debug", False):
             raise
-        print(f"sprite: error: {error}", file=sys.stderr)
+        print(f"wisp: error: {error}", file=sys.stderr)
         return 1
 
 
@@ -102,8 +101,8 @@ def _cmd_from_vcf(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = SpriteArgumentParser(
-        prog="sprite",
+    parser = WispArgumentParser(
+        prog="wisp",
         description="build population count masks",
         show_banner=True,
     )
@@ -130,7 +129,7 @@ def _add_common_run_args(p: argparse.ArgumentParser, *, min_dp_required: bool = 
     p.add_argument("--out", required=True, help="output directory")
     p.add_argument(
         "--output-prefix",
-        default="sprite",
+        default="wisp",
         help="output file prefix within --out; .bed.gz is appended",
     )
     p.add_argument("--work", help="working directory; defaults to <out>/work")
@@ -235,7 +234,7 @@ def _setup_logging(*, verbose: bool, quiet: bool) -> None:
         level = logging.INFO
     logging.basicConfig(
         level=level,
-        format="%(asctime)s [sprite] %(message)s",
+        format="%(asctime)s [wisp] %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
         stream=sys.stderr,
         force=True,
@@ -243,7 +242,7 @@ def _setup_logging(*, verbose: bool, quiet: bool) -> None:
 
 
 def _print_subprocess_error(error: subprocess.CalledProcessError) -> None:
-    print(f"sprite: command failed with exit code {error.returncode}", file=sys.stderr)
+    print(f"wisp: command failed with exit code {error.returncode}", file=sys.stderr)
     print(" ".join(str(part) for part in error.cmd), file=sys.stderr)
     if error.stderr:
         print(str(error.stderr).rstrip(), file=sys.stderr)

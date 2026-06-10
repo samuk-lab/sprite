@@ -1,12 +1,12 @@
 Arguments
 *********
 
-All arguments are listed below. ``sprite --help`` shows the same information.
+All arguments are listed below. ``wisp --help`` shows the same information.
 
 Commands
 ========
 
-``sprite`` has two subcommands:
+``wisp`` has two subcommands:
 
 **from-alignments**
     Build a population count mask from BAM/CRAM files via ``mosdepth``.
@@ -26,7 +26,7 @@ Core arguments
     is supplied.
 
 **--out PATH**
-    Output directory for the final ``sprite.bed.gz`` and tabix index.
+    Output directory for the final ``wisp.bed.gz`` and tabix index.
 
 Input-specific arguments
 ========================
@@ -66,8 +66,8 @@ Shared optional arguments
     intervals are emitted.
 
 **--output-prefix TEXT**
-    Output filename stem within ``--out``. Defaults to ``sprite``,
-    producing ``sprite.bed.gz`` and ``sprite.bed.gz.tbi``. ``.bed.gz``
+    Output filename stem within ``--out``. Defaults to ``wisp``,
+    producing ``wisp.bed.gz`` and ``wisp.bed.gz.tbi``. ``.bed.gz``
     is always appended.
 
 **--keep-work**
@@ -75,11 +75,11 @@ Shared optional arguments
     files are removed after a successful run.
 
 **--force**
-    Overwrite existing final outputs. Without this flag, ``sprite`` refuses
-    to replace ``sprite.bed.gz`` or ``sprite.bed.gz.tbi``.
+    Overwrite existing final outputs. Without this flag, ``wisp`` refuses
+    to replace ``wisp.bed.gz`` or ``wisp.bed.gz.tbi``.
 
 **--version**
-    Print the installed ``sprite`` version and exit.
+    Print the installed ``wisp`` version and exit.
 
 **--help**
     Print the full help message and exit.
@@ -125,7 +125,7 @@ BAM/CRAM mode:
 
 .. code-block:: console
 
-   sprite from-alignments \
+   wisp from-alignments \
      --samples tests/test_data/1000g_5sample_chr20_smoke/samples.tsv \
      --min-dp 10 \
      --variants-vcf validation/cohort.variants.vcf.gz \
@@ -140,7 +140,7 @@ All-sites VCF mode:
 
 .. code-block:: console
 
-   sprite from-vcf \
+   wisp from-vcf \
      --all-sites-vcf validation/cohort.all_sites.vcf.gz \
      --popfile validation/sample_populations.tsv \
      --min-dp 10 \

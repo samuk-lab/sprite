@@ -1,4 +1,4 @@
-name: sprite
+name: wisp
 channels:
   - conda-forge
   - bioconda

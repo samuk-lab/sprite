@@ -1,31 +1,31 @@
-`sprite`<img src="https://raw.githubusercontent.com/samuk-lab/sprite/master/docs/images/sprite_logo.png" align="right" width="20%">
+`wisp`<img src="https://raw.githubusercontent.com/samuk-lab/wisp/master/docs/images/wisp_logo.png" align="right" width="20%">
 ====================
 
-`sprite` builds population count masks from BAM/CRAM alignments or all-sites VCFs. It is a companion tool for [pixy](https://github.com/ksamuk/pixy/), though it works equally well on its own.
+`wisp` builds population count masks from BAM/CRAM alignments or all-sites VCFs. It is a companion tool for [pixy](https://github.com/ksamuk/pixy/), though it works equally well on its own.
 
 Population count masks let you correctly compute the denominators of π, d<sub>xy</sub>, Watterson's θ, and Tajima's D when working from a variants-only VCF — callable sites are counted per population rather than collapsed into a single cohort-wide pass/fail.
 
-Sprite is inspired by [mop](https://github.com/RILAB/mop), [clam](https://github.com/cademirch/clam), and makes heavy use of [mosdepth](https://github.com/brentp/mosdepth).
+Wisp is inspired by [mop](https://github.com/RILAB/mop), [clam](https://github.com/cademirch/clam), and makes heavy use of [mosdepth](https://github.com/brentp/mosdepth).
 
-> **Note:** `sprite` is pre-release (alpha) and pending validation. It will be distributed on Bioconda as `sprite-mask` once stable.
+> **Note:** `wisp` is pre-release (alpha) and pending validation. It will be distributed on Bioconda as `wisp-mask` once stable.
 
 ## Installation
 
 ```bash
-mamba create -n sprite python=3.11 pip git -c conda-forge
-mamba activate sprite
+mamba create -n wisp python=3.11 pip git -c conda-forge
+mamba activate wisp
 mamba install -c conda-forge samtools bcftools htslib mosdepth
-python -m pip install "git+https://github.com/samuk-lab/sprite.git"
+python -m pip install "git+https://github.com/samuk-lab/wisp.git"
 ```
 
 ## Usage
 
 ### From BAM/CRAM alignments
 
-`sprite` runs [mosdepth](https://github.com/brentp/mosdepth) on each sample and collapses per-sample pass intervals into a population count mask:
+`wisp` runs [mosdepth](https://github.com/brentp/mosdepth) on each sample and collapses per-sample pass intervals into a population count mask:
 
 ```bash
-sprite from-alignments \
+wisp from-alignments \
   --samples samples.tsv \
   --variants-vcf variants.vcf.gz \
   --out results \
@@ -43,7 +43,7 @@ sample_2   popB        /path/sample_2.cram
 
 If BAM/CRAM read groups include sample names, they must match the corresponding `sample_id`.
 
-When `--variants-vcf` is provided, `sprite` uses the variants-only VCF to fill in omitted
+When `--variants-vcf` is provided, `wisp` uses the variants-only VCF to fill in omitted
 alignment thresholds: `--min-dp`/`--max-dp` from per-sample `FORMAT/DP` and `--min-mapq`
 from `INFO/MQ` when those fields are available. Manually supplied threshold flags take
 precedence. The same VCF is also scanned for indels, symbolic structural variants, breakends,
@@ -54,7 +54,7 @@ population.
 ### From an all-sites VCF
 
 ```bash
-sprite from-vcf \
+wisp from-vcf \
   --all-sites-vcf all_sites.vcf.gz \
   --popfile populations.tsv \
   --min-dp 10 \
@@ -73,19 +73,19 @@ sample_2   popB
 A few things to know about VCF mode:
 
 - Every sample in the population file must appear in the VCF. VCF samples absent from the population file are ignored (with a warning).
-- Records may carry any `FILTER` value — the input is assumed to have been filtered as desired before running `sprite`.
+- Records may carry any `FILTER` value — the input is assumed to have been filtered as desired before running `wisp`.
 - A sample passes a site when `FORMAT/DP >= --min-dp`, if supplied `FORMAT/DP <= --max-dp`, and, when `FORMAT/GT` is present, the genotype is not missing.
 - At duplicate `CHROM:POS` records, a sample passes a site if any duplicate passes the depth thresholds. Duplicates must be contiguous, as in a coordinate-sorted VCF.
 - By default, all record types are used (SNPs, indels, symbolic alleles, invariant sites). Pass `--snps-only` to exclude indel sites while retaining invariant sites.
 
 ## Output
 
-`sprite` writes two files to `--out`:
+`wisp` writes two files to `--out`:
 
 | File | Description |
 |---|---|
-| `sprite.bed.gz` | bgzip-compressed, tabix-indexed population count mask |
-| `sprite.bed.gz.tbi` | tabix index |
+| `wisp.bed.gz` | bgzip-compressed, tabix-indexed population count mask |
+| `wisp.bed.gz.tbi` | tabix index |
 
 Use `--output-prefix` to change the filename stem; `.bed.gz` is always appended.
 

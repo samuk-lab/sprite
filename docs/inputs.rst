@@ -24,7 +24,7 @@ Accepted header aliases:
 Without a recognized header, columns are read in order:
 ``sample_id``, ``population``, ``alignment``.
 
-Alignment paths may be absolute or relative. For relative paths, ``sprite``
+Alignment paths may be absolute or relative. For relative paths, ``wisp``
 first checks the current value, then the path relative to the sample table's
 parent directory.
 
@@ -59,7 +59,7 @@ All-sites VCF
 columns. Every sample ID in ``--popfile`` must appear in the VCF. VCF samples
 absent from ``--popfile`` produce a warning and are ignored.
 
-For each record, ``sprite`` reads the ``DP`` field from the sample's
+For each record, ``wisp`` reads the ``DP`` field from the sample's
 ``FORMAT`` value. Missing DP values do not pass. Non-integer DP values are
 rejected. A sample passes when DP is at least ``--min-dp``, if ``--max-dp`` is
 supplied no greater than ``--max-dp``, and, when ``GT`` is present in
@@ -77,15 +77,15 @@ coordinate system as the alignments. When sample columns are present, every
 sample ID in ``--samples`` must appear in the VCF; extra VCF samples are
 ignored for threshold estimation.
 
-``sprite`` uses this VCF in two ways.
+``wisp`` uses this VCF in two ways.
 
 Threshold estimation
 --------------------
 
-If ``--min-dp`` or ``--max-dp`` is omitted, ``sprite`` estimates it from
+If ``--min-dp`` or ``--max-dp`` is omitted, ``wisp`` estimates it from
 positive per-sample ``FORMAT/DP`` values at variant records. ``--min-dp``
 uses the smallest observed positive DP and ``--max-dp`` uses the largest
-observed positive DP. If ``--min-mapq`` is omitted, ``sprite`` estimates it
+observed positive DP. If ``--min-mapq`` is omitted, ``wisp`` estimates it
 from the smallest ``INFO/MQ`` value, rounded down to an integer.
 
 Any threshold supplied manually on the command line takes precedence over

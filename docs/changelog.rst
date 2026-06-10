@@ -13,5 +13,5 @@ Highlights:
   depth/MAPQ thresholds and exclude indel, structural-variant, breakend, and
   multi-nucleotide polymorphism spans.
 * Build the same output from prefiltered all-sites VCF ``FORMAT/DP`` values.
-* Write bgzipped and tabix-indexed ``sprite.bed.gz`` output.
+* Write bgzipped and tabix-indexed ``wisp.bed.gz`` output.
 * Include JSON metadata and population column headers in the output BED.

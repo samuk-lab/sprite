@@ -7,7 +7,7 @@ from typing import TextIO
 
 import pytest
 
-from sprite_mask.bedtools import (
+from wisp_mask.bedtools import (
     build_multiinter_command,
     intersect_sort_merge,
     run_multiinter,
@@ -27,7 +27,7 @@ def test_sort_and_merge_bed_builds_bedtools_pipeline(
         calls.append(([list(command) for command in commands], out_path))
         out_path.write_text("merged\n")
 
-    monkeypatch.setattr("sprite_mask.bedtools.run_pipeline", fake_run_pipeline)
+    monkeypatch.setattr("wisp_mask.bedtools.run_pipeline", fake_run_pipeline)
 
     in_bed = tmp_path / "in.bed"
     out_bed = tmp_path / "out.bed"
@@ -54,7 +54,7 @@ def test_intersect_sort_merge_builds_bedtools_pipeline(
     def fake_run_pipeline(commands: Sequence[Sequence[str]], out_path: Path) -> None:
         calls.append(([list(command) for command in commands], out_path))
 
-    monkeypatch.setattr("sprite_mask.bedtools.run_pipeline", fake_run_pipeline)
+    monkeypatch.setattr("wisp_mask.bedtools.run_pipeline", fake_run_pipeline)
 
     a_bed = tmp_path / "a.bed"
     b_bed = tmp_path / "b.bed"
@@ -82,7 +82,7 @@ def test_subtract_sort_merge_builds_bedtools_pipeline(
     def fake_run_pipeline(commands: Sequence[Sequence[str]], out_path: Path) -> None:
         calls.append(([list(command) for command in commands], out_path))
 
-    monkeypatch.setattr("sprite_mask.bedtools.run_pipeline", fake_run_pipeline)
+    monkeypatch.setattr("wisp_mask.bedtools.run_pipeline", fake_run_pipeline)
 
     a_bed = tmp_path / "a.bed"
     b_bed = tmp_path / "b.bed"
@@ -121,7 +121,7 @@ def test_run_multiinter_invokes_bedtools_and_writes_stdout(
         stdout.write("chrom\tstart\tend\tnum\tlist\ts1\n")
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setattr("sprite_mask.bedtools.subprocess.run", fake_run)
+    monkeypatch.setattr("wisp_mask.bedtools.subprocess.run", fake_run)
 
     out_tsv = tmp_path / "nested" / "multiinter.tsv"
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
-from sprite_mask.models import Sample
+from wisp_mask.models import Sample
 
 ALIGNMENT_ALIASES = {"alignment", "bam_or_cram", "bam", "cram"}
 SAMPLE_ID_ALIASES = {"sample_id", "sample", "id"}

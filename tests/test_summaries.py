@@ -5,13 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from sprite_mask.summaries import summarize_population_count_bed
+from wisp_mask.summaries import summarize_population_count_bed
 
 
 def test_summarize_population_count_bed(tmp_path: Path) -> None:
     bed = tmp_path / "population_counts.bed"
     bed.write_text(
-        "#sprite_mask_metadata\t{}\n"
+        "#wisp_mask_metadata\t{}\n"
         "#chrom\tstart\tend\tpopA\tpopB\n"
         "chr1\t0\t10\t1\t0\n"
         "chr1\t10\t25\t2\t1\n"

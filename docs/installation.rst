@@ -4,7 +4,7 @@ Installation
 Requirements
 ============
 
-``sprite`` requires Python 3.11 or 3.12. Runtime command line tools depend
+``wisp`` requires Python 3.11 or 3.12. Runtime command line tools depend
 on the input mode:
 
 * BAM/CRAM mode requires ``samtools``, ``mosdepth``, ``bedtools``, ``bgzip``, and ``tabix``.
@@ -21,26 +21,26 @@ From the repository root, create and activate the development environment:
 .. code-block:: console
 
    mamba env create -f environment.yml
-   conda activate sprite
+   conda activate wisp
    python -m pip install -e ".[dev]"
 
 If the environment already exists, update it instead:
 
 .. code-block:: console
 
-   mamba env update -n sprite -f environment.yml
-   conda activate sprite
+   mamba env update -n wisp -f environment.yml
+   conda activate wisp
    python -m pip install -e ".[dev]"
 
 Verify the CLI
 ==============
 
-After installation, verify the ``sprite`` command:
+After installation, verify the ``wisp`` command:
 
 .. code-block:: console
 
-   sprite --help
-   sprite --version
+   wisp --help
+   wisp --version
 
 Build these docs locally
 ========================

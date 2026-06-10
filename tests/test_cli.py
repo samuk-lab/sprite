@@ -10,17 +10,17 @@ from pathlib import Path
 
 import pytest
 
-from sprite_mask import __version__
-from sprite_mask.cli import HELP_BANNER, build_parser, main
-from sprite_mask.models import WorkflowOutputs
+from wisp_mask import __version__
+from wisp_mask.cli import HELP_BANNER, build_parser, main
+from wisp_mask.models import WorkflowOutputs
 
-SPRITE_PROGRESS_RE = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[sprite\] Analysis ")
+WISP_PROGRESS_RE = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[wisp\] Analysis ")
 
 
 def test_root_help_starts_with_banner_and_version() -> None:
     help_text = build_parser().format_help()
 
-    assert help_text.startswith(f"{HELP_BANNER}\nsprite {__version__}\n\nusage:")
+    assert help_text.startswith(f"{HELP_BANNER}\nwisp {__version__}\n\nusage:")
 
 
 def test_from_alignments_help_describes_fast_mode_replacement() -> None:
@@ -37,10 +37,10 @@ def test_from_alignments_help_describes_fast_mode_replacement() -> None:
     assert "--strict-depth" not in help_text
 
 
-def assert_sprite_progress(log_output: str, message: str) -> None:
+def assert_wisp_progress(log_output: str, message: str) -> None:
     matching_lines = [line for line in log_output.splitlines() if message in line]
     assert matching_lines
-    assert SPRITE_PROGRESS_RE.match(matching_lines[0])
+    assert WISP_PROGRESS_RE.match(matching_lines[0])
 
 
 def test_main_all_sites_vcf_writes_indexed_population_bed(
@@ -85,12 +85,12 @@ def test_main_all_sites_vcf_writes_indexed_population_bed(
     assert status == 0
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert_sprite_progress(captured.err, "Analysis start: validating VCF workflow inputs")
-    assert_sprite_progress(captured.err, "Analysis VCF: building population counts")
-    assert_sprite_progress(captured.err, "Analysis complete: wrote")
-    assert "sprite.bed.gz" in captured.err
+    assert_wisp_progress(captured.err, "Analysis start: validating VCF workflow inputs")
+    assert_wisp_progress(captured.err, "Analysis VCF: building population counts")
+    assert_wisp_progress(captured.err, "Analysis complete: wrote")
+    assert "wisp.bed.gz" in captured.err
 
-    population_bed = out_dir / "sprite.bed.gz"
+    population_bed = out_dir / "wisp.bed.gz"
     population_index = Path(f"{population_bed}.tbi")
     assert population_bed.exists()
     assert population_index.exists()
@@ -129,11 +129,11 @@ def test_main_builds_alignment_run_config(
         nonlocal seen_config
         seen_config = config
         return WorkflowOutputs(
-            population_count_bed_gz=tmp_path / "out" / "sprite.bed.gz",
-            population_count_bed_index=tmp_path / "out" / "sprite.bed.gz.tbi",
+            population_count_bed_gz=tmp_path / "out" / "wisp.bed.gz",
+            population_count_bed_index=tmp_path / "out" / "wisp.bed.gz.tbi",
         )
 
-    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+    monkeypatch.setattr("wisp_mask.cli.run_workflow", fake_run_workflow)
 
     status = main(
         [
@@ -172,7 +172,7 @@ def test_main_builds_alignment_run_config(
     assert seen_config is not None
     assert seen_config.samples_path == tmp_path / "samples.tsv"
     assert seen_config.min_dp == 30
-    assert seen_config.output_prefix == "sprite"
+    assert seen_config.output_prefix == "wisp"
     assert seen_config.threads == 4
     assert seen_config.jobs == 2
     assert seen_config.mask_bed == tmp_path / "targets.bed"
@@ -200,11 +200,11 @@ def test_main_builds_alignment_run_config_with_variants_vcf_default_min_dp(
         nonlocal seen_config
         seen_config = config
         return WorkflowOutputs(
-            population_count_bed_gz=tmp_path / "out" / "sprite.bed.gz",
-            population_count_bed_index=tmp_path / "out" / "sprite.bed.gz.tbi",
+            population_count_bed_gz=tmp_path / "out" / "wisp.bed.gz",
+            population_count_bed_index=tmp_path / "out" / "wisp.bed.gz.tbi",
         )
 
-    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+    monkeypatch.setattr("wisp_mask.cli.run_workflow", fake_run_workflow)
 
     status = main(
         [
@@ -238,7 +238,7 @@ def test_main_accepts_output_prefix(
             population_count_bed_index=tmp_path / "out" / "custom.bed.gz.tbi",
         )
 
-    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+    monkeypatch.setattr("wisp_mask.cli.run_workflow", fake_run_workflow)
 
     status = main(
         [
@@ -271,11 +271,11 @@ def test_main_from_vcf_accepts_snps_only(
         nonlocal seen_config
         seen_config = config
         return WorkflowOutputs(
-            population_count_bed_gz=tmp_path / "out" / "sprite.bed.gz",
-            population_count_bed_index=tmp_path / "out" / "sprite.bed.gz.tbi",
+            population_count_bed_gz=tmp_path / "out" / "wisp.bed.gz",
+            population_count_bed_index=tmp_path / "out" / "wisp.bed.gz.tbi",
         )
 
-    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+    monkeypatch.setattr("wisp_mask.cli.run_workflow", fake_run_workflow)
 
     status = main(
         [
@@ -308,7 +308,7 @@ def test_main_reports_subprocess_errors(
     def fake_run_workflow(_config: object) -> WorkflowOutputs:
         raise subprocess.CalledProcessError(9, ["tool", "arg"], stderr="bad things\n")
 
-    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+    monkeypatch.setattr("wisp_mask.cli.run_workflow", fake_run_workflow)
 
     status = main(
         [
@@ -326,7 +326,7 @@ def test_main_reports_subprocess_errors(
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == (
-        "sprite: command failed with exit code 9\n"
+        "wisp: command failed with exit code 9\n"
         "tool arg\n"
         "bad things\n"
     )
@@ -340,7 +340,7 @@ def test_main_reports_regular_exceptions(
     def fake_run_workflow(_config: object) -> WorkflowOutputs:
         raise ValueError("bad config")
 
-    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+    monkeypatch.setattr("wisp_mask.cli.run_workflow", fake_run_workflow)
 
     status = main(
         [
@@ -357,7 +357,7 @@ def test_main_reports_regular_exceptions(
     assert status == 1
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "sprite: error: bad config\n"
+    assert captured.err == "wisp: error: bad config\n"
 
 
 def test_main_no_subcommand_returns_error(capsys: pytest.CaptureFixture[str]) -> None:
@@ -366,7 +366,7 @@ def test_main_no_subcommand_returns_error(capsys: pytest.CaptureFixture[str]) ->
     assert status == 1
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err.startswith(f"{HELP_BANNER}\nsprite {__version__}\n\nusage:")
+    assert captured.err.startswith(f"{HELP_BANNER}\nwisp {__version__}\n\nusage:")
 
 
 def test_main_dry_run_skips_execution_and_returns_zero(
@@ -378,11 +378,11 @@ def test_main_dry_run_skips_execution_and_returns_zero(
     def fake_run_workflow(config: object) -> WorkflowOutputs:
         calls.append(config)
         return WorkflowOutputs(
-            population_count_bed_gz=tmp_path / "out" / "sprite.bed.gz",
-            population_count_bed_index=tmp_path / "out" / "sprite.bed.gz.tbi",
+            population_count_bed_gz=tmp_path / "out" / "wisp.bed.gz",
+            population_count_bed_index=tmp_path / "out" / "wisp.bed.gz.tbi",
         )
 
-    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+    monkeypatch.setattr("wisp_mask.cli.run_workflow", fake_run_workflow)
 
     status = main(
         [
@@ -409,7 +409,7 @@ def test_main_debug_reraises_exception(
     def fake_run_workflow(_config: object) -> WorkflowOutputs:
         raise ValueError("internal error")
 
-    monkeypatch.setattr("sprite_mask.cli.run_workflow", fake_run_workflow)
+    monkeypatch.setattr("wisp_mask.cli.run_workflow", fake_run_workflow)
 
     with pytest.raises(ValueError, match="internal error"):
         main(

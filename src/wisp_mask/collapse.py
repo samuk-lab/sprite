@@ -6,9 +6,9 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, TextIO
 
-from sprite_mask import __version__
-from sprite_mask.models import Sample
-from sprite_mask.samples import populations_in_order, sample_population_map
+from wisp_mask import __version__
+from wisp_mask.models import Sample
+from wisp_mask.samples import populations_in_order, sample_population_map
 
 
 def collapse_population_counts(
@@ -92,14 +92,14 @@ def write_quantized_bed_header(
     metadata: dict[str, Any],
 ) -> None:
     full_metadata = {
-        "sprite_mask_version": __version__,
+        "wisp_mask_version": __version__,
         "columns": columns,
         "coordinate_system": "BED 0-based half-open",
         "zero_count_intervals_omitted": True,
         **metadata,
     }
     handle.write(
-        "#sprite_mask_metadata\t"
+        "#wisp_mask_metadata\t"
         + json.dumps(full_metadata, sort_keys=True, separators=(",", ":"))
         + "\n"
     )

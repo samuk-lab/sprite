@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
 cd "${REPO_ROOT}"
 
-SCRIPT_VERSION="2026-05-28-sprite-test-data-20samples-4chroms-v6-github-size-guard"
+SCRIPT_VERSION="2026-05-28-wisp-test-data-20samples-4chroms-v6-github-size-guard"
 
 # download_1000g_20sample_4chrom_highcov_fixture.sh
 #
@@ -17,7 +17,7 @@ SCRIPT_VERSION="2026-05-28-sprite-test-data-20samples-4chroms-v6-github-size-gua
 #   - 20 regional BAMs: 10 GBR + 10 YRI
 #   - one indexed multi-sample VCF containing all 20 samples
 #   - four 50 kb regions from four different chromosomes
-#   - samples.tsv metadata for sprite-mask
+#   - samples.tsv metadata for wisp-mask
 #   - targets.bed for the selected regions
 #
 # Important contig-name behavior:
@@ -34,7 +34,7 @@ SCRIPT_VERSION="2026-05-28-sprite-test-data-20samples-4chroms-v6-github-size-gua
 #   bash tests/test_data/scripts/download_1000g_20sample_4chrom_highcov_fixture.sh
 #
 # Optional:
-#   ENV_NAME=sprite-test-data bash tests/test_data/scripts/download_1000g_20sample_4chrom_highcov_fixture.sh
+#   ENV_NAME=wisp-test-data bash tests/test_data/scripts/download_1000g_20sample_4chrom_highcov_fixture.sh
 #   OUTDIR=tests/test_data/1000g_20sample_highcov_4chrom_subset bash tests/test_data/scripts/download_1000g_20sample_4chrom_highcov_fixture.sh
 #   THREADS=4 bash tests/test_data/scripts/download_1000g_20sample_4chrom_highcov_fixture.sh
 #   DOWNSAMPLE_FRAC=1 bash tests/test_data/scripts/download_1000g_20sample_4chrom_highcov_fixture.sh
@@ -48,7 +48,7 @@ SCRIPT_VERSION="2026-05-28-sprite-test-data-20samples-4chroms-v6-github-size-gua
 #   - htslib's CRAM reference cache is stored outside the fixture directory by
 #     default so large reference slices are not accidentally committed.
 
-ENV_NAME="${ENV_NAME:-sprite-test-data}"
+ENV_NAME="${ENV_NAME:-wisp-test-data}"
 OUTDIR="${OUTDIR:-tests/test_data/1000g_20sample_highcov_4chrom_subset}"
 THREADS="${THREADS:-2}"
 FORCE="${FORCE:-0}"
@@ -59,9 +59,9 @@ FORCE="${FORCE:-0}"
 MAX_GITHUB_FILE_BYTES="${MAX_GITHUB_FILE_BYTES:-52428800}"
 
 if [ -n "${XDG_CACHE_HOME:-}" ]; then
-    DEFAULT_REF_CACHE_DIR="${XDG_CACHE_HOME}/sprite-test-data/ref_cache"
+    DEFAULT_REF_CACHE_DIR="${XDG_CACHE_HOME}/wisp-test-data/ref_cache"
 else
-    DEFAULT_REF_CACHE_DIR="${HOME}/.cache/sprite-test-data/ref_cache"
+    DEFAULT_REF_CACHE_DIR="${HOME}/.cache/wisp-test-data/ref_cache"
 fi
 REF_CACHE_DIR="${REF_CACHE_DIR:-${DEFAULT_REF_CACHE_DIR}}"
 
@@ -657,7 +657,7 @@ approximately 30x * ${DOWNSAMPLE_FRAC}. Set DOWNSAMPLE_FRAC=1 to keep full depth
 
 ## Files
 
-- \`samples.tsv\`: sprite sample metadata
+- \`samples.tsv\`: wisp sample metadata
 - \`sample_populations.tsv\`: sample/population metadata
 - \`sample_populations_and_sources.tsv\`: sample/population/source CRAM metadata
 - \`samples.list\`: sample list used for VCF subsetting

@@ -28,7 +28,7 @@ approximately 30x * 0.67. Set DOWNSAMPLE_FRAC=1 to keep full depth.
 
 ## Files
 
-- `samples.tsv`: sprite-mask sample metadata
+- `samples.tsv`: wisp-mask sample metadata
 - `sample_populations.tsv`: sample/population metadata
 - `sample_populations_and_sources.tsv`: sample/population/source CRAM metadata
 - `samples.list`: sample list used for VCF subsetting

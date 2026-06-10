@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from sprite_mask.collapse import collapse_population_counts
-from sprite_mask.models import Sample
+from wisp_mask.collapse import collapse_population_counts
+from wisp_mask.models import Sample
 
 
 def test_collapse_population_counts_merges_equal_population_vectors(tmp_path: Path) -> None:
@@ -132,7 +132,7 @@ def test_collapse_population_counts_rejects_non_integer_indicators(tmp_path: Pat
 def _read_header_metadata(path: Path) -> dict[str, object]:
     first_line = path.read_text().splitlines()[0]
     prefix, encoded = first_line.split("\t", maxsplit=1)
-    assert prefix == "#sprite_mask_metadata"
+    assert prefix == "#wisp_mask_metadata"
     metadata = json.loads(encoded)
     assert metadata["columns"][0:3] == ["chrom", "start", "end"]
     assert metadata["coordinate_system"] == "BED 0-based half-open"

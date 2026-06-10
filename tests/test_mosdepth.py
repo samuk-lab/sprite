@@ -6,9 +6,9 @@ from typing import Any, TextIO
 
 import pytest
 
-from sprite_mask.config import AlignmentRunConfig
-from sprite_mask.models import Sample
-from sprite_mask.mosdepth import (
+from wisp_mask.config import AlignmentRunConfig
+from wisp_mask.models import Sample
+from wisp_mask.mosdepth import (
     build_mosdepth_command,
     mosdepth_outputs_for_prefix,
     run_mosdepth,
@@ -51,7 +51,7 @@ def test_run_mosdepth_sets_quantize_env_and_returns_outputs(
         outputs.global_dist.write_text("dist")
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setattr("sprite_mask.mosdepth.subprocess.run", fake_run)
+    monkeypatch.setattr("wisp_mask.mosdepth.subprocess.run", fake_run)
 
     outputs = run_mosdepth(sample, config)
 
@@ -79,7 +79,7 @@ def test_run_mosdepth_rejects_missing_expected_outputs(
     def fake_run(*_args: object, **_kwargs: object) -> subprocess.CompletedProcess[str]:
         return subprocess.CompletedProcess(["mosdepth"], 0)
 
-    monkeypatch.setattr("sprite_mask.mosdepth.subprocess.run", fake_run)
+    monkeypatch.setattr("wisp_mask.mosdepth.subprocess.run", fake_run)
 
     with pytest.raises(FileNotFoundError, match="quantized.bed.gz"):
         run_mosdepth(sample, config)

@@ -9,10 +9,10 @@ from math import floor
 from pathlib import Path
 from typing import TextIO
 
-from sprite_mask.bedio import iter_bed3
-from sprite_mask.collapse import write_quantized_bed_header
-from sprite_mask.models import Sample
-from sprite_mask.samples import populations_in_order
+from wisp_mask.bedio import iter_bed3
+from wisp_mask.collapse import write_quantized_bed_header
+from wisp_mask.models import Sample
+from wisp_mask.samples import populations_in_order
 
 logger = logging.getLogger(__name__)
 

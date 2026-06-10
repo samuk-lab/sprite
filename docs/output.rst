@@ -8,8 +8,8 @@ Each successful run writes two files to ``--out``:
 
 .. code-block:: text
 
-   sprite.bed.gz
-   sprite.bed.gz.tbi
+   wisp.bed.gz
+   wisp.bed.gz.tbi
 
 The population count mask is bgzip-compressed and indexed with
 ``tabix -p bed``. Use ``--output-prefix`` to choose a different filename
@@ -22,7 +22,7 @@ The mask starts with two comment-prefixed header lines:
 
 .. code-block:: text
 
-   #sprite_mask_metadata  {"columns":["chrom","start","end","GBR","YRI"],...}
+   #wisp_mask_metadata  {"columns":["chrom","start","end","GBR","YRI"],...}
    #chrom  start  end  GBR  YRI
 
 Data rows contain:
@@ -46,9 +46,9 @@ all counts are zero are omitted.
 Metadata
 ========
 
-The ``#sprite_mask_metadata`` line is JSON. It includes:
+The ``#wisp_mask_metadata`` line is JSON. It includes:
 
-* ``sprite_mask_version``
+* ``wisp_mask_version``
 * ``format``
 * ``columns``
 * ``coordinate_system``

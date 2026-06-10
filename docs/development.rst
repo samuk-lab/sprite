@@ -7,7 +7,7 @@ Set up a development environment
 .. code-block:: console
 
    mamba env create -f environment.yml
-   conda activate sprite
+   conda activate wisp
    python -m pip install -e ".[dev,docs]"
 
 Run checks
@@ -38,7 +38,7 @@ Project layout
 
 .. code-block:: text
 
-   src/sprite_mask/     package source
+   src/wisp_mask/     package source
    tests/               unit and workflow tests
    tests/test_data/     small 1000 Genomes fixtures and download scripts
    docs/                Sphinx documentation
@@ -46,7 +46,7 @@ Project layout
 Implementation overview
 =======================
 
-The public CLI is defined in ``sprite_mask.cli``. Parsed arguments are converted
+The public CLI is defined in ``wisp_mask.cli``. Parsed arguments are converted
 to ``RunConfig`` and passed to ``run_workflow``. The workflow validates the input
-mode, runs either the BAM/CRAM or VCF builder, writes ``sprite.bed.gz``,
+mode, runs either the BAM/CRAM or VCF builder, writes ``wisp.bed.gz``,
 and creates the tabix index.
